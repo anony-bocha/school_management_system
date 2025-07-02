@@ -1,34 +1,26 @@
-
-
-
-
-
-
-
-
-
-
-
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import student
+from .models import Student
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
-from django.contrib.auth.decorators import login_required
 
 @login_required
 def home(request):
-    students = student.objects.filter(user=request.user)
+    students = Student.objects.all()  # or filter by something relevant later
     return render(request, 'school/home.html', {'students': students})
-@login_required
-def submit_grade(request):
-    if request.method == 'POST':
-        title = request.POST['title']
-        content = request.POST['content']
-        student.objects.create(user=request.user, title=title, content=content)
-        return redirect('home')
-    return render(request, 'school/submit_grade.html')  # ✅ use this name
 
+@login_required
+def submit_student(request):
+    if request.method == 'POST':
+        name = request.POST['name']
+        age = request.POST['age']
+        email = request.POST.get('email', '')
+        address = request.POST.get('address', '')
+
+        Student.objects.create(name=name, age=age, email=email)
+        return redirect('home')
+    return render(request, 'school/submit_student.html')  # Use this template
 
 def register(request):
     if request.method == 'POST':
@@ -38,11 +30,7 @@ def register(request):
             login(request, user)
             return redirect('home')
         else:
-            # show errors on form
-            return render(request, 'registration/signup.html', {'form': form})
+            return render(request, 'registration/register.html', {'form': form})
     else:
         form = UserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
-
-
-

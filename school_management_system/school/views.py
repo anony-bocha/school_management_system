@@ -2,10 +2,18 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import ClassRoom, Subject, Teacher, Student
 from django.http import HttpResponse
 from .forms import ClassRoomForm
+from django.urls import reverse
+from django.http import HttpResponseRedirect
 
 
 
 
+def delete_classroom(request, pk):
+    classroom = get_object_or_404(ClassRoom, pk=pk)
+    if request.method == 'POST':
+        classroom.delete()
+        return redirect('classroom_list')
+    return render(request, 'school/classroom_confirm_delete.html', {'classroom': classroom})
 
 # Home page (students listing for now)
 def home(request):
@@ -56,11 +64,14 @@ def classroom_delete(request, pk):
     return HttpResponse(f"Classroom Delete Placeholder for ID {pk}")
 
 # ---------- SUBJECT VIEWS ----------
+
 def subject_list(request):
-    return HttpResponse("Subject List Placeholder")
+    subjects = Subject.objects.all()
+    return render(request, 'school/subject_list.html', {'subjects': subjects})
 
 def subject_detail(request, pk):
-    return HttpResponse(f"Subject Detail Placeholder for ID {pk}")
+    subject = get_object_or_404(Subject, pk=pk)
+    return render(request, 'school/subject_detail.html', {'subject': subject})
 
 def subject_create(request):
     return HttpResponse("Subject Create Placeholder")

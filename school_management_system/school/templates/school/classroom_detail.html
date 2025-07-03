@@ -3,11 +3,17 @@
 <html>
 <head>
     <title>Classroom Detail - {{ classroom.name }} {{ classroom.section }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        h1, h2 { color: #2c3e50; }
+        a { color: #2980b9; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
 </head>
 <body>
     <h1>Classroom: {{ classroom.name }} {{ classroom.section }}</h1>
 
-    <p><a href="{% url 'classroom_list' %}">Back to Classroom List</a></p>
+    <p><a href="{% url 'classroom_list' %}">← Back to Classroom List</a></p>
 
     <h2>Students</h2>
     {% if students %}
@@ -24,7 +30,9 @@
     {% if subjects %}
         <ul>
             {% for subject in subjects %}
-                <li>{{ subject.name }}</li>
+                <li>
+                    <a href="{% url 'subject_detail' subject.pk %}">{{ subject.name }}</a>
+                </li>
             {% endfor %}
         </ul>
     {% else %}
@@ -32,9 +40,8 @@
     {% endif %}
 
     <p>
-        <a href="{% url 'classroom_update' classroom.pk %}">Edit Classroom</a>
- |
-        <a href="{% url 'classroom_delete' classroom.pk %}">Delete Classroom</a>
+        <a href="{% url 'classroom_update' classroom.pk %}">✏️ Edit Classroom</a> |
+        <a href="{% url 'delete_classroom' classroom.pk %}">🗑️ Delete Classroom</a>
     </p>
 </body>
 </html>

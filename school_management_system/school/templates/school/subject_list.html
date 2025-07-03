@@ -1,0 +1,36 @@
+<!-- school/templates/school/subject_list.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Subject List</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        h1 { color: #2c3e50; }
+        a { color: #2980b9; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>Subjects</h1>
+
+    <p><a href="{% url 'subject_create' %}">+ Add New Subject</a></p>
+
+    {% if subjects %}
+        <ul>
+            {% for subject in subjects %}
+                <li>
+                    <a href="{% url 'subject_detail' subject.pk %}">{{ subject.name }}</a>
+                    - Classroom:
+                    <a href="{% url 'classroom_detail' subject.classroom.pk %}">
+                        {{ subject.classroom.name }} {{ subject.classroom.section }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No subjects available.</p>
+    {% endif %}
+
+    <p><a href="{% url 'classroom_list' %}">← Back to Classroom List</a></p>
+</body>
+</html>

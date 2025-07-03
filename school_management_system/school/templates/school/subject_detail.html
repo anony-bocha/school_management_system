@@ -1,0 +1,44 @@
+<!-- school/templates/school/subject_detail.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Subject Detail - {{ subject.name }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        h1, h2 { color: #2c3e50; }
+        a { color: #2980b9; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>Subject: {{ subject.name }}</h1>
+
+    <p>
+        <a href="{% url 'subject_list' %}">← Back to Subject List</a>
+    </p>
+
+    <h2>Classroom</h2>
+    <p>
+        <a href="{% url 'classroom_detail' subject.classroom.pk %}">
+            {{ subject.classroom.name }} {{ subject.classroom.section }}
+        </a>
+    </p>
+
+    <h2>Teachers</h2>
+    {% if subject.teachers.all %}
+        <ul>
+            {% for teacher in subject.teachers.all %}
+                <li>{{ teacher.name }} ({{ teacher.gender }})</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No teachers assigned to this subject yet.</p>
+    {% endif %}
+
+    <p>
+        <a href="{% url 'subject_update' subject.pk %}">✏️ Edit Subject</a> |
+        <a href="{% url 'subject_delete' subject.pk %}">🗑️ Delete Subject</a>
+    </p>
+
+</body>
+</html>

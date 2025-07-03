@@ -6,13 +6,24 @@
 </head>
 <body>
     <h1>Classrooms</h1>
-    <p><a href="{% url 'classroom_create' %}">Add New Classroom</a></p>
+
+   <p> <a href="{% url 'classroom_create' %}">+ Add New Classroom</a></p>
+
     <ul>
         {% for classroom in classrooms %}
-        <li><a href="{% url 'classroom_detail' classroom.pk %}">{{ classroom.name }} - Section {{ classroom.section }}</a></li>
+        <li>
+            <a href="{% url 'classroom_detail' classroom.pk %}">{{ classroom.name }} - Section {{ classroom.section }}</a>
+            |
+            <a href="{% url 'classroom_update' classroom.pk %}">Edit</a>
+
+            |
+            <a href="{% url 'delete_classroom' classroom.pk %}">Delete Classroom</a>
+
+        </li>
         {% empty %}
         <li>No classrooms available.</li>
         {% endfor %}
     </ul>
+
 </body>
 </html>

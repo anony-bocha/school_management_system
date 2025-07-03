@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 class ClassRoom(models.Model):
     name = models.CharField(max_length=50)
     section = models.CharField(max_length=5, blank=True)
-    description = models.TextField(blank=True, null=True)  # Optional description field
+    description = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.name} {self.section}".strip()
@@ -49,7 +49,7 @@ class Attendance(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES)
 
     class Meta:
-        unique_together = ('student', 'date')  # Prevent duplicate attendance records
+        unique_together = ('student', 'date')
 
     def __str__(self):
         return f"{self.student.name} - {self.date} - {self.status}"
@@ -61,7 +61,7 @@ class Grade(models.Model):
     grade = models.CharField(max_length=2)
 
     class Meta:
-        unique_together = ('student', 'subject')  # One grade per subject per student
+        unique_together = ('student', 'subject')
 
     def __str__(self):
         return f"{self.student.name} - {self.subject.name} - {self.grade}"
@@ -82,7 +82,7 @@ class Timetable(models.Model):
     period_time = models.TimeField()
 
     class Meta:
-        unique_together = ('classroom', 'day_of_week', 'period_time')  # Prevent overlapping periods
+        unique_together = ('classroom', 'day_of_week', 'period_time')
 
     def __str__(self):
         return f"{self.classroom} - {self.subject} - {self.day_of_week} - {self.period_time}"

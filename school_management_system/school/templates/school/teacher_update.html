@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Teacher - {{ teacher.name }}</title>
+</head>
+<body>
+    <h1>Edit Teacher: {{ teacher.name }}</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save Changes</button>
+    </form>
+
+    <p><a href="{% url 'teacher_detail' teacher.pk %}">Back to Teacher Detail</a></p>
+</body>
+</html>

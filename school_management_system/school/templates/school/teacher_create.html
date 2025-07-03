@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add New Teacher</title>
+</head>
+<body>
+    <h1>Add New Teacher</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save Teacher</button>
+    </form>
+
+    <p><a href="{% url 'teacher_list' %}">← Back to Teacher List</a></p>
+</body>
+</html>

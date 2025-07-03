@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teacher List</title>
+</head>
+<body>
+    <h1>Teachers</h1>
+
+    <p><a href="{% url 'teacher_create' %}">+ Add New Teacher</a></p>
+
+    {% if teachers %}
+        <ul>
+            {% for teacher in teachers %}
+                <li>
+                    {{ teacher.name }} ({{ teacher.gender }})
+                    - Subjects:
+                    {% for subject in teacher.subjects.all %}
+                        {{ subject.name }}{% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        No subjects
+                    {% endfor %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No teachers available.</p>
+    {% endif %}
+
+    <p><a href="{% url 'classroom_list' %}">← Back to Classrooms</a></p>
+</body>
+</html>

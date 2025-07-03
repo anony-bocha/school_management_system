@@ -18,7 +18,7 @@ class Subject(models.Model):
 
 class Teacher(models.Model):
     GENDER_CHOICES = [('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')]
-    
+
     name = models.CharField(max_length=100)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
     subjects = models.ManyToManyField(Subject, related_name='teachers')
@@ -26,6 +26,8 @@ class Teacher(models.Model):
 
     def __str__(self):
         return self.name
+
+
 
 class Student(models.Model):
     GENDER_CHOICES = [('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')]

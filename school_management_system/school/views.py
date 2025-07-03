@@ -5,6 +5,10 @@ from .forms import ClassRoomForm
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from .forms import SubjectForm
+from .models import Teacher
+from .forms import TeacherForm
+
+
 
 
 
@@ -91,19 +95,41 @@ def subject_delete(request, pk):
 
 # ---------- TEACHER VIEWS ----------
 def teacher_list(request):
-    return HttpResponse("Teacher List Placeholder")
+    teachers = Teacher.objects.all()
+    return render(request, 'school/teacher_list.html', {'teachers': teachers})
 
 def teacher_detail(request, pk):
-    return HttpResponse(f"Teacher Detail Placeholder for ID {pk}")
+    teacher = get_object_or_404(Teacher, pk=pk)
+    return render(request, 'school/teacher_detail.html', {'teacher': teacher})
+
 
 def teacher_create(request):
-    return HttpResponse("Teacher Create Placeholder")
+    if request.method == 'POST':
+        form = TeacherForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('teacher_list')
+    else:
+        form = TeacherForm()
+    return render(request, 'school/teacher_create.html', {'form': form})
 
 def teacher_update(request, pk):
-    return HttpResponse(f"Teacher Update Placeholder for ID {pk}")
+    teacher = get_object_or_404(Teacher, pk=pk)
+    if request.method == 'POST':
+        form = TeacherForm(request.POST, instance=teacher)
+        if form.is_valid():
+            form.save()
+            return redirect('teacher_detail', pk=teacher.pk)
+    else:
+        form = TeacherForm(instance=teacher)
+    return render(request, 'school/teacher_update.html', {'form': form, 'teacher': teacher})
 
 def teacher_delete(request, pk):
-    return HttpResponse(f"Teacher Delete Placeholder for ID {pk}")
+    teacher = get_object_or_404(Teacher, pk=pk)
+    if request.method == 'POST':
+        teacher.delete()
+        return redirect('teacher_list')
+    return render(request, 'school/teacher_delete_confirm.html', {'teacher': teacher})
 
 # ---------- STUDENT VIEWS ----------
 def student_list(request):

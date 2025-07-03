@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from .forms import ClassRoomForm
 from django.urls import reverse
 from django.http import HttpResponseRedirect
-
+from .forms import SubjectForm
 
 
 
@@ -38,7 +38,6 @@ def classroom_detail(request, pk):
     }
     return render(request, 'school/classroom_detail.html', context)
 
-
 def classroom_create(request):
     if request.method == 'POST':
         form = ClassRoomForm(request.POST)
@@ -47,7 +46,7 @@ def classroom_create(request):
             return redirect('classroom_list')
     else:
         form = ClassRoomForm()
-    return render(request, 'school/classroom_form.html', {'form': form})
+    return render(request, 'school/classroom_create.html', {'form': form})
 def classroom_update(request, pk):
     classroom = get_object_or_404(ClassRoom, pk=pk)
     if request.method == 'POST':
@@ -73,8 +72,16 @@ def subject_detail(request, pk):
     subject = get_object_or_404(Subject, pk=pk)
     return render(request, 'school/subject_detail.html', {'subject': subject})
 
+
 def subject_create(request):
-    return HttpResponse("Subject Create Placeholder")
+    if request.method == 'POST':
+        form = SubjectForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('subject_list')
+    else:
+        form = SubjectForm()
+    return render(request, 'school/subject_create.html', {'form': form})
 
 def subject_update(request, pk):
     return HttpResponse(f"Subject Update Placeholder for ID {pk}")

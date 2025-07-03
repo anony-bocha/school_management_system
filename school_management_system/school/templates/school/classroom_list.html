@@ -1,0 +1,18 @@
+<!-- school/templates/school/classroom_list.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Classroom List</title>
+</head>
+<body>
+    <h1>Classrooms</h1>
+    <p><a href="{% url 'classroom_create' %}">Add New Classroom</a></p>
+    <ul>
+        {% for classroom in classrooms %}
+        <li><a href="{% url 'classroom_detail' classroom.pk %}">{{ classroom.name }} - Section {{ classroom.section }}</a></li>
+        {% empty %}
+        <li>No classrooms available.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

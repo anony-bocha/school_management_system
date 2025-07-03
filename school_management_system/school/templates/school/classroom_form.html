@@ -1,0 +1,16 @@
+<!-- school/templates/school/classroom_form.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title }}</title>
+</head>
+<body>
+    <h1>{{ title }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save</button>
+    </form>
+    <p><a href="{% url 'classroom_list' %}">Back to Classroom List</a></p>
+</body>
+</html>

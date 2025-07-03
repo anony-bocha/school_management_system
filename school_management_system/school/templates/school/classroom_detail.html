@@ -1,17 +1,40 @@
+<!-- school/templates/school/classroom_detail.html -->
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Classroom Details</title>
+    <title>Classroom Detail - {{ classroom.name }} {{ classroom.section }}</title>
 </head>
 <body>
-    <h1>Classroom: {{ classroom.name }} - Section {{ classroom.section }}</h1>
+    <h1>Classroom: {{ classroom.name }} {{ classroom.section }}</h1>
 
-    <p><strong>Description:</strong> {{ classroom.description }}</p>
+    <p><a href="{% url 'classroom_list' %}">Back to Classroom List</a></p>
+
+    <h2>Students</h2>
+    {% if students %}
+        <ul>
+            {% for student in students %}
+                <li>{{ student.name }} ({{ student.gender }}, Age: {{ student.age }})</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No students enrolled in this classroom.</p>
+    {% endif %}
+
+    <h2>Subjects</h2>
+    {% if subjects %}
+        <ul>
+            {% for subject in subjects %}
+                <li>{{ subject.name }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No subjects assigned to this classroom.</p>
+    {% endif %}
 
     <p>
-        <a href="{% url 'classroom_update' classroom.pk %}">Edit Classroom</a> |
-        <a href="{% url 'classroom_delete' classroom.pk %}">Delete Classroom</a> |
-        <a href="{% url 'classroom_list' %}">Back to Classrooms List</a>
+        <a href="{% url 'classroom_update' classroom.pk %}">Edit Classroom</a>
+ |
+        <a href="{% url 'classroom_delete' classroom.pk %}">Delete Classroom</a>
     </p>
 </body>
 </html>

@@ -1,24 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import ClassRoom, Subject, Teacher, Student
 from django.http import HttpResponse
+from .forms import ClassRoomForm
 
 
 
-def classroom_create(request):
-    if request.method == 'POST':
-        form = ClassRoomForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('classroom_list')
-    else:
-        form = ClassRoomForm()
-    return render(request, 'school/classroom_form.html', {'form': form, 'title': 'Create Classroom'})
 
-
-
-def classroom_detail(request, pk):
-    classroom = get_object_or_404(ClassRoom, pk=pk)
-    return render(request, 'school/classroom_detail.html', {'classroom': classroom})
 
 # Home page (students listing for now)
 def home(request):
@@ -30,14 +17,40 @@ def classroom_list(request):
     return render(request, 'school/classroom_list.html', {'classrooms': classrooms})
 
 
+
 def classroom_detail(request, pk):
-    return HttpResponse(f"Classroom Detail Placeholder for ID {pk}")
+    classroom = get_object_or_404(ClassRoom, pk=pk)
+    students = Student.objects.filter(classroom=classroom)
+    subjects = Subject.objects.filter(classroom=classroom)
+
+    context = {
+        'classroom': classroom,
+        'students': students,
+        'subjects': subjects,
+    }
+    return render(request, 'school/classroom_detail.html', context)
+
 
 def classroom_create(request):
-    return HttpResponse("Classroom Create Placeholder")
-
+    if request.method == 'POST':
+        form = ClassRoomForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('classroom_list')
+    else:
+        form = ClassRoomForm()
+    return render(request, 'school/classroom_form.html', {'form': form})
 def classroom_update(request, pk):
-    return HttpResponse(f"Classroom Update Placeholder for ID {pk}")
+    classroom = get_object_or_404(ClassRoom, pk=pk)
+    if request.method == 'POST':
+        form = ClassRoomForm(request.POST, instance=classroom)
+        if form.is_valid():
+            form.save()
+            return redirect('classroom_detail', pk=classroom.pk)
+    else:
+        form = ClassRoomForm(instance=classroom)
+    return render(request, 'school/classroom_update.html', {'form': form})
+
 
 def classroom_delete(request, pk):
     return HttpResponse(f"Classroom Delete Placeholder for ID {pk}")

@@ -132,20 +132,46 @@ def teacher_delete(request, pk):
     return render(request, 'school/teacher_delete_confirm.html', {'teacher': teacher})
 
 # ---------- STUDENT VIEWS ----------
+
 def student_list(request):
-    return HttpResponse("Student List Placeholder")
+    students = Student.objects.all()
+    return render(request, 'school/student_list.html', {'students': students})
 
 def student_detail(request, pk):
-    return HttpResponse(f"Student Detail Placeholder for ID {pk}")
+    student = get_object_or_404(Student, pk=pk)
+    return render(request, 'school/student_detail.html', {'student': student})
+
 
 def student_create(request):
-    return HttpResponse("Student Create Placeholder")
+    if request.method == 'POST':
+        form = StudentForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('student_list')
+    else:
+        form = StudentForm()
+    return render(request, 'school/student_form.html', {'form': form, 'title': 'Add Student'})
+
+
 
 def student_update(request, pk):
-    return HttpResponse(f"Student Update Placeholder for ID {pk}")
+    student = get_object_or_404(Student, pk=pk)
+    if request.method == 'POST':
+        form = StudentForm(request.POST, request.FILES, instance=student)
+        if form.is_valid():
+            form.save()
+            return redirect('student_list')
+    else:
+        form = StudentForm(instance=student)
+    return render(request, 'school/student_form.html', {'form': form, 'title': 'Edit Student'})
+
 
 def student_delete(request, pk):
-    return HttpResponse(f"Student Delete Placeholder for ID {pk}")
+    student = get_object_or_404(Student, pk=pk)
+    if request.method == 'POST':
+        student.delete()
+        return redirect('student_list')
+    return render(request, 'school/student_confirm_delete.html', {'student': student})
 
 # ---------- ATTENDANCE VIEWS ----------
 def attendance_list(request):
@@ -160,3 +186,11 @@ def grade_list(request):
 
 def grade_create(request):
     return HttpResponse("Grade Create Placeholder")
+# school/views.py
+
+
+
+# STUDENT VIEWS
+
+
+

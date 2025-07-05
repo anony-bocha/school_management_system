@@ -111,7 +111,7 @@ def teacher_create(request):
             return redirect('teacher_list')
     else:
         form = TeacherForm()
-    return render(request, 'school/teacher_create.html', {'form': form})
+    return render(request, 'school/teacher_form.html', {'form': form, 'title': 'Add Teacher'})
 
 def teacher_update(request, pk):
     teacher = get_object_or_404(Teacher, pk=pk)
@@ -119,10 +119,10 @@ def teacher_update(request, pk):
         form = TeacherForm(request.POST, instance=teacher)
         if form.is_valid():
             form.save()
-            return redirect('teacher_detail', pk=teacher.pk)
+            return redirect('teacher_list')
     else:
         form = TeacherForm(instance=teacher)
-    return render(request, 'school/teacher_update.html', {'form': form, 'teacher': teacher})
+    return render(request, 'school/teacher_form.html', {'form': form, 'title': 'Edit Teacher'})
 
 def teacher_delete(request, pk):
     teacher = get_object_or_404(Teacher, pk=pk)

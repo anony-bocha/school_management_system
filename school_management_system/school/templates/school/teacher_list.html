@@ -19,6 +19,9 @@
                     {% empty %}
                         No subjects
                     {% endfor %}
+                    |
+                    <a href="{% url 'teacher_edit' teacher.pk %}">Edit</a> |
+                    <a href="{% url 'teacher_delete' teacher.pk %}">Delete</a>
                 </li>
             {% endfor %}
         </ul>

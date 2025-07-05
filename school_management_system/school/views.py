@@ -8,6 +8,7 @@ from .forms import SubjectForm
 from .models import Teacher
 from .forms import TeacherForm
 
+from .forms import StudentForm
 
 
 

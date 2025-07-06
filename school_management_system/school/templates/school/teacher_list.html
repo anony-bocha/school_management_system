@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Teacher List</title>
-</head>
-<body>
+{% extends 'school/base.html' %}
+{% block title %}Teachers list{% endblock %}
+{% block content %}<
     <h1>Teachers</h1>
 
     <p><a href="{% url 'teacher_create' %}">+ Add New Teacher</a></p>
@@ -30,5 +27,4 @@
     {% endif %}
 
     <p><a href="{% url 'classroom_list' %}">← Back to Classrooms</a></p>
-</body>
-</html>
+{% endblock %}

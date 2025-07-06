@@ -42,7 +42,6 @@ def classroom_detail(request, pk):
         'subjects': subjects,
     }
     return render(request, 'school/classroom_detail.html', context)
-
 def classroom_create(request):
     if request.method == 'POST':
         form = ClassRoomForm(request.POST)
@@ -51,7 +50,8 @@ def classroom_create(request):
             return redirect('classroom_list')
     else:
         form = ClassRoomForm()
-    return render(request, 'school/classroom_create.html', {'form': form})
+    return render(request, 'school/classroom_form.html', {'form': form, 'title': 'Add Classroom'})
+
 def classroom_update(request, pk):
     classroom = get_object_or_404(ClassRoom, pk=pk)
     if request.method == 'POST':
@@ -61,7 +61,8 @@ def classroom_update(request, pk):
             return redirect('classroom_detail', pk=classroom.pk)
     else:
         form = ClassRoomForm(instance=classroom)
-    return render(request, 'school/classroom_update.html', {'form': form})
+    return render(request, 'school/classroom_form.html', {'form': form, 'title': 'Edit Classroom'})
+
 
 
 def classroom_delete(request, pk):

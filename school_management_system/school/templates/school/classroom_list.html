@@ -1,10 +1,7 @@
-<!-- school/templates/school/classroom_list.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Classroom List</title>
-</head>
-<body>
+{% extends 'school/base.html' %}
+{% block title %}class Room list{% endblock %}
+{% block content %}<!-- school/templates/school/classroom_list.html -->
+
     <h1>Classrooms</h1>
 
    <p> <a href="{% url 'classroom_create' %}">+ Add New Classroom</a></p>
@@ -25,5 +22,4 @@
         {% endfor %}
     </ul>
 
-</body>
-</html>
+    {% endblock %}

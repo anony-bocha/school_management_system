@@ -1,16 +1,13 @@
 <!-- school/templates/school/classroom_update.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Update Classroom</title>
-</head>
-<body>
-    <h1>Update Classroom</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Update Classroom</button>
-    </form>
-    <p><a href="{% url 'classroom_list' %}">Back to Classroom List</a></p>
-</body>
-</html>
+
+{% extends 'school/base.html' %}
+{% block title %}Classroom: {{ classroom.name }} {{ classroom.section }}{% endblock %}
+{% block content %}
+<h1>Update Classroom</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Update Classroom</button>
+</form>
+<p><a href="{% url 'classroom_list' %}">Back to Classroom List</a></p>
+{% endblock %}

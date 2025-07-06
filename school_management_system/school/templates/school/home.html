@@ -1,1 +1,8 @@
+{% extends 'school/base.html' %}
+{% block title %}Classroom: {{ classroom.name }} {{ classroom.section }}{% endblock %}
+{% block content %}
 <h1>this is home page</h1>
+
+<p><a href="{% url 'classroom_list' %}">Classroom List</a></p>
+
+{% endblock %}

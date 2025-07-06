@@ -1,16 +1,7 @@
 <!-- school/templates/school/subject_list.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Subject List</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        h1 { color: #2c3e50; }
-        a { color: #2980b9; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-    </style>
-</head>
-<body>
+{% extends 'school/base.html' %}
+{% block title %}class Room list{% endblock %}
+{% block content %}
     <h1>Subjects</h1>
 
     <p><a href="{% url 'subject_create' %}">+ Add New Subject</a></p>
@@ -32,5 +23,4 @@
     {% endif %}
 
     <p><a href="{% url 'classroom_list' %}">← Back to Classroom List</a></p>
-</body>
-</html>
+{% endblock %}

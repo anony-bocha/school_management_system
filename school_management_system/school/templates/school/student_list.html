@@ -1,26 +1,24 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Student List</title>
-</head>
-<body>
-    <h1>Students</h1>
-    <p><a href="{% url 'student_create' %}">+ Add New Student</a></p>
-    {% if students %}
-        <ul>
-            {% for student in students %}
-                <li>
-                    {{ student.name }} ({{ student.age }} years)
-                    |
-                    <a href="{% url 'student_detail' student.pk %}">View</a> |
-                    <a href="{% url 'student_update' student.pk %}">Edit</a> |
-                    <a href="{% url 'student_delete' student.pk %}">Delete</a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No students available.</p>
-    {% endif %}
-    <p><a href="{% url 'classroom_list' %}">← Back to Classrooms</a></p>
-</body>
-</html>
+{% extends 'school/base.html' %}
+{% block title %}student list{% endblock %}
+{% block content %}
+
+<h1>Students</h1>
+<p><a href="{% url 'student_create' %}">+ Add New Student</a></p>
+{% if students %}
+    <ul>
+        {% for student in students %}
+            <li>
+                {{ student.name }} ({{ student.age }} years)
+                |
+                <a href="{% url 'student_detail' student.pk %}">View</a> |
+                <a href="{% url 'student_update' student.pk %}">Edit</a> |
+                <a href="{% url 'student_delete' student.pk %}">Delete</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No students available.</p>
+{% endif %}
+<p><a href="{% url 'classroom_list' %}">← Back to Classrooms</a></p>
+<p><a href="{% url 'classroom_list' %}">Back to Classroom List</a></p>
+{% endblock %}

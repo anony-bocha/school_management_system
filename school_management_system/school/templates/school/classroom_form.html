@@ -1,16 +1,16 @@
-<!-- school/templates/school/classroom_form.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Classroom</title>
-</head>
-<body>
-    <h1>Add New Classroom</h1>
-    <form method="post">
+{% extends 'school/base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">{{ title }}</h1>
+
+    <form method="post" class="mb-4">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Save</button>
+        <button type="submit" class="btn btn-primary">💾 Save</button>
+        <a href="{% url 'classroom_list' %}" class="btn btn-secondary">← Back to Classroom List</a>
     </form>
-    <p><a href="{% url 'classroom_list' %}">Back to Classroom List</a></p>
-</body>
-</html>
+</div>
+{% endblock %}

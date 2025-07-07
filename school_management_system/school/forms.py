@@ -7,6 +7,14 @@ from .models import Attendance
 
 
 
+from .models import Grade
+
+class GradeForm(forms.ModelForm):
+    class Meta:
+        model = Grade
+        fields = ['student', 'subject', 'marks', 'grade']
+
+
 class AttendanceForm(forms.ModelForm):
     class Meta:
         model = Attendance

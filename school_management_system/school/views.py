@@ -2,7 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.urls import reverse
 from django.contrib import messages
-
+from .models import Grade
+from .forms import GradeForm
 from .models import ClassRoom, Subject, Teacher, Student
 from .forms import ClassRoomForm, SubjectForm, TeacherForm, StudentForm
 from .models import Attendance
@@ -22,6 +23,10 @@ def home(request):
         'total_subjects': total_subjects,
         'total_classrooms': total_classrooms,
     })
+
+
+
+
 
 
 # ---------- CLASSROOM VIEWS ----------
@@ -216,10 +221,40 @@ def student_delete(request, pk):
 
 # ---------- GRADES VIEWS ----------
 def grade_list(request):
-    return HttpResponse("Grades List Placeholder")
+    grades = Grade.objects.select_related('student', 'subject').order_by('-id')
+    return render(request, 'school/grade_list.html', {'grades': grades})
 
 def grade_create(request):
-    return HttpResponse("Grade Create Placeholder")
+    if request.method == 'POST':
+        form = GradeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Grade added successfully.')
+            return redirect('grade_list')
+    else:
+        form = GradeForm()
+    return render(request, 'school/grade_form.html', {'form': form, 'title': 'Add Grade'})
+
+def grade_update(request, pk):
+    grade = get_object_or_404(Grade, pk=pk)
+    if request.method == 'POST':
+        form = GradeForm(request.POST, instance=grade)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Grade updated successfully.')
+            return redirect('grade_list')
+    else:
+        form = GradeForm(instance=grade)
+    return render(request, 'school/grade_form.html', {'form': form, 'title': 'Edit Grade'})
+
+def grade_delete(request, pk):
+    grade = get_object_or_404(Grade, pk=pk)
+    if request.method == 'POST':
+        grade.delete()
+        messages.success(request, 'Grade deleted successfully.')
+        return redirect('grade_list')
+    return render(request, 'school/grade_confirm_delete.html', {'grade': grade})
+
 
 
 # ---------- ATTENDANCE VIEWS ----------

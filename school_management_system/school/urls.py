@@ -38,5 +38,8 @@ urlpatterns = [
     path('attendances/create/', views.attendance_create, name='attendance_create'),
     path('attendances/<int:pk>/edit/', views.attendance_update, name='attendance_update'),
     path('attendances/<int:pk>/delete/', views.attendance_delete, name='attendance_delete'),
-
+    path('grades/', grade_list, name='grade_list'),
+    path('grades/create/', grade_create, name='grade_create'),
+    path('grades/<int:pk>/edit/', grade_update, name='grade_update'),
+    path('grades/<int:pk>/delete/', grade_delete, name='grade_delete'),
 ]

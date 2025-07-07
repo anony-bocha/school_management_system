@@ -1,28 +1,26 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Teacher Detail - {{ teacher.name }}</title>
-</head>
-<body>
-    <h1>Teacher: {{ teacher.name }}</h1>
-    <p>Gender: {{ teacher.gender }}</p>
-    <p>Contact: {{ teacher.contact }}</p>
+{% extends 'school/base.html' %}
 
-    <h2>Subjects</h2>
+{% block title %}Teacher: {{ teacher.name }}{% endblock %}
+
+{% block content %}
+    <h2>Teacher: {{ teacher.name }}</h2>
+    <p><strong>Gender:</strong> {{ teacher.gender }}</p>
+    <p><strong>Contact:</strong> {{ teacher.contact }}</p>
+
+    <h3>Subjects</h3>
     {% if teacher.subjects.all %}
         <ul>
             {% for subject in teacher.subjects.all %}
-                <li>{{ subject.name }}</li>
+                <li>{{ subject.name }} ({{ subject.code }})</li>
             {% endfor %}
         </ul>
     {% else %}
         <p>No subjects assigned.</p>
     {% endif %}
 
-    <p>
-        <a href="{% url 'teacher_update' teacher.pk %}">Edit</a> |
-        <a href="{% url 'teacher_delete' teacher.pk %}">Delete</a> |
-        <a href="{% url 'teacher_list' %}">Back to Teacher List</a>
-    </p>
-</body>
-</html>
+    <div style="margin-top: 1rem;">
+        <a href="{% url 'teacher_update' teacher.pk %}" class="btn btn-warning">Edit</a>
+        <a href="{% url 'teacher_delete_confirm' teacher.pk %}" class="btn btn-danger">Delete</a>
+        <a href="{% url 'teacher_list' %}" class="btn btn-secondary">← Back to Teacher List</a>
+    </div>
+{% endblock %}

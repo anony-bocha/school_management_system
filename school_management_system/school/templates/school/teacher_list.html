@@ -11,10 +11,11 @@
 
 <!-- Search Form -->
 <form method="get" style="margin-bottom: 1rem; display: flex; gap: 0.5rem; align-items: center;">
-    <input type="text" name="q" placeholder="Search teachers by name" value="{{ request.GET.q }}" style="flex: 1; padding: 0.5rem;">
+    <input type="text" name="q" placeholder="Search teachers by name" value="{{ query }}" style="flex: 1; padding: 0.5rem;">
     <button type="submit" class="btn btn-success">Search</button>
     <a href="{% url 'teacher_list' %}" class="btn btn-secondary">Clear</a>
 </form>
+
 
 {% if teachers %}
 <div style="overflow-x: auto;">

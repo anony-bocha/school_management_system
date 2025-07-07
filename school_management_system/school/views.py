@@ -7,7 +7,8 @@ from .forms import GradeForm
 from .models import ClassRoom, Subject, Teacher, Student
 from .forms import ClassRoomForm, SubjectForm, TeacherForm, StudentForm
 from .models import Attendance
-from .forms import AttendanceForm
+from .forms import AttendanceForm   
+
 # ---------- HOME ----------
 def home(request):
     students = Student.objects.all()
@@ -119,49 +120,54 @@ def subject_delete(request, pk):
         return redirect('subject_list')
     return render(request, 'school/subject_confirm_delete.html', {'subject': subject})
 
-# ---------- TEACHER VIEWS ----------def teacher_list(request):
-def teacher_list(request):
-    teachers = Teacher.objects.all()
-    query = request.GET.get('q')
-    if query:
-        teachers = teachers.filter(name__icontains=query)
-    return render(request, 'school/teacher_list.html', {'teachers': teachers})
+# ---------- TEACHER VIEWS ----------
 
+
+def teacher_list(request):
+    query = request.GET.get('q', '')  # get search query or empty string
+    if query:
+        teachers = Teacher.objects.filter(name__icontains=query)
+    else:
+        teachers = Teacher.objects.all()
+    context = {
+        'teachers': teachers,
+        'query': query,
+    }
+    return render(request, 'school/teacher_list.html', context)
 
 def teacher_detail(request, pk):
     teacher = get_object_or_404(Teacher, pk=pk)
     return render(request, 'school/teacher_detail.html', {'teacher': teacher})
 
+
 def teacher_create(request):
     if request.method == 'POST':
         form = TeacherForm(request.POST)
         if form.is_valid():
-            teacher = form.save()
-            messages.success(request, f"Teacher '{teacher.name}' created successfully.")
+            form.save()
             return redirect('teacher_list')
     else:
         form = TeacherForm()
-    return render(request, 'school/teacher_form.html', {'form': form, 'title': 'Add Teacher'})
+    return render(request, 'school/teacher_form.html', {'form': form})
 
 def teacher_update(request, pk):
     teacher = get_object_or_404(Teacher, pk=pk)
     if request.method == 'POST':
         form = TeacherForm(request.POST, instance=teacher)
         if form.is_valid():
-            teacher = form.save()
-            messages.success(request, f"Teacher '{teacher.name}' updated successfully.")
-            return redirect('teacher_detail', pk=teacher.pk)
+            form.save()
+            return redirect('teacher_detail', pk=pk)
     else:
         form = TeacherForm(instance=teacher)
-    return render(request, 'school/teacher_form.html', {'form': form, 'title': 'Edit Teacher'})
+    return render(request, 'school/teacher_form.html', {'form': form})
 
 def teacher_delete(request, pk):
     teacher = get_object_or_404(Teacher, pk=pk)
     if request.method == 'POST':
         teacher.delete()
-        messages.success(request, f"Teacher '{teacher.name}' deleted successfully.")
         return redirect('teacher_list')
-    return render(request, 'school/teacher_delete_confirm.html', {'teacher': teacher})
+    return render(request, 'school/teacher_confirm_delete.html', {'teacher': teacher})
+
 
 # ---------- STUDENT VIEWS ----------
 def student_list(request):

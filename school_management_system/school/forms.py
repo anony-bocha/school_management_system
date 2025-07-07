@@ -42,10 +42,10 @@ class TeacherForm(forms.ModelForm):
 class SubjectForm(forms.ModelForm):
     class Meta:
         model = Subject
-        fields = ['name', 'classroom']
+        fields = ['name', 'code'] 
       
 
 class ClassRoomForm(forms.ModelForm):
     class Meta:
         model = ClassRoom
-        fields = ['name', 'section', 'description']
+        fields = ['name', 'section', 'subjects']

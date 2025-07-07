@@ -10,20 +10,23 @@ from .models import Attendance
 from .forms import AttendanceForm   
 
 # ---------- HOME ----------
+
 def home(request):
-    students = Student.objects.all()
-    total_students = students.count()
+    total_students = Student.objects.count()
     total_teachers = Teacher.objects.count()
     total_subjects = Subject.objects.count()
     total_classrooms = ClassRoom.objects.count()
+    students = Student.objects.order_by('-id')[:10]  # Show 10 recent students
 
-    return render(request, 'school/home.html', {
-        'students': students,
+    context = {
         'total_students': total_students,
         'total_teachers': total_teachers,
         'total_subjects': total_subjects,
         'total_classrooms': total_classrooms,
-    })
+        'students': students,
+    }
+    return render(request, 'school/home.html', context)
+
 
 
 

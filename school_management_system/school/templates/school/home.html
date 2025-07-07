@@ -6,52 +6,62 @@
 <h2>📊 School Management Dashboard</h2>
 
 <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
-    <div style="flex: 1; min-width: 200px; padding: 1rem; background: #f8f9fa; border-radius: 8px; text-align: center;">
+    <div style="flex: 1; min-width: 200px; padding: 1.5rem; background: #f0f4f8; border-radius: 10px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
         <h3>Total Students</h3>
-        <p style="font-size: 2rem;">{{ total_students }}</p>
+        <p style="font-size: 2.5rem; font-weight: bold; color: #0073e6;">{{ total_students }}</p>
         <a href="{% url 'student_list' %}" class="btn btn-primary">View Students</a>
     </div>
-    <div style="flex: 1; min-width: 200px; padding: 1rem; background: #f8f9fa; border-radius: 8px; text-align: center;">
+    <div style="flex: 1; min-width: 200px; padding: 1.5rem; background: #f0f4f8; border-radius: 10px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
         <h3>Total Teachers</h3>
-        <p style="font-size: 2rem;">{{ total_teachers }}</p>
+        <p style="font-size: 2.5rem; font-weight: bold; color: #0073e6;">{{ total_teachers }}</p>
         <a href="{% url 'teacher_list' %}" class="btn btn-primary">View Teachers</a>
     </div>
-    <div style="flex: 1; min-width: 200px; padding: 1rem; background: #f8f9fa; border-radius: 8px; text-align: center;">
+    <div style="flex: 1; min-width: 200px; padding: 1.5rem; background: #f0f4f8; border-radius: 10px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
         <h3>Total Subjects</h3>
-        <p style="font-size: 2rem;">{{ total_subjects }}</p>
+        <p style="font-size: 2.5rem; font-weight: bold; color: #0073e6;">{{ total_subjects }}</p>
         <a href="{% url 'subject_list' %}" class="btn btn-primary">View Subjects</a>
     </div>
-    <div style="flex: 1; min-width: 200px; padding: 1rem; background: #f8f9fa; border-radius: 8px; text-align: center;">
+    <div style="flex: 1; min-width: 200px; padding: 1.5rem; background: #f0f4f8; border-radius: 10px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
         <h3>Total Classrooms</h3>
-        <p style="font-size: 2rem;">{{ total_classrooms }}</p>
+        <p style="font-size: 2.5rem; font-weight: bold; color: #0073e6;">{{ total_classrooms }}</p>
         <a href="{% url 'classroom_list' %}" class="btn btn-primary">View Classrooms</a>
     </div>
 </div>
 
-<h3>All Students (Recent)</h3>
-<table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
-    <thead style="background-color: #f2f2f2;">
+<h3>Students List</h3>
+
+<!-- Search box -->
+<input
+    type="text"
+    id="studentSearch"
+    placeholder="Search students by name..."
+    style="width: 100%; padding: 10px; margin-bottom: 1rem; border-radius: 5px; border: 1px solid #ccc;"
+    onkeyup="filterStudents()"
+/>
+
+<table style="width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <thead style="background-color: #0073e6; color: white;">
         <tr>
-            <th style="padding: 0.5rem; border: 1px solid #ddd;">Name</th>
-            <th style="padding: 0.5rem; border: 1px solid #ddd;">Gender</th>
-            <th style="padding: 0.5rem; border: 1px solid #ddd;">Classroom</th>
-            <th style="padding: 0.5rem; border: 1px solid #ddd;">Actions</th>
+            <th style="padding: 12px 15px; text-align: left;">Name</th>
+            <th style="padding: 12px 15px; text-align: left;">Gender</th>
+            <th style="padding: 12px 15px; text-align: left;">Classroom</th>
+            <th style="padding: 12px 15px; text-align: left;">Actions</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="studentsTableBody">
         {% for student in students %}
-        <tr>
-            <td style="padding: 0.5rem; border: 1px solid #ddd;">{{ student.name }}</td>
-            <td style="padding: 0.5rem; border: 1px solid #ddd;">{{ student.gender }}</td>
-            <td style="padding: 0.5rem; border: 1px solid #ddd;">
+        <tr style="border-bottom: 1px solid #ddd;">
+            <td style="padding: 12px 15px;">{{ student.name }}</td>
+            <td style="padding: 12px 15px;">{{ student.gender }}</td>
+            <td style="padding: 12px 15px;">
                 {% if student.classroom %}
                     {{ student.classroom.name }}
                 {% else %}
                     N/A
                 {% endif %}
             </td>
-            <td style="padding: 0.5rem; border: 1px solid #ddd;">
-                <a href="{% url 'student_detail' student.pk %}" class="btn btn-sm btn-info">View</a>
+            <td style="padding: 12px 15px;">
+                <a href="{% url 'student_detail' student.pk %}" class="btn btn-info btn-sm" style="background-color: #0073e6; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none;">View</a>
             </td>
         </tr>
         {% empty %}
@@ -61,4 +71,25 @@
         {% endfor %}
     </tbody>
 </table>
+
+<script>
+    function filterStudents() {
+        const input = document.getElementById("studentSearch");
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById("studentsTableBody");
+        const rows = table.getElementsByTagName("tr");
+
+        for (let i = 0; i < rows.length; i++) {
+            const nameCell = rows[i].getElementsByTagName("td")[0];
+            if (nameCell) {
+                const nameText = nameCell.textContent || nameCell.innerText;
+                if (nameText.toLowerCase().indexOf(filter) > -1) {
+                    rows[i].style.display = "";
+                } else {
+                    rows[i].style.display = "none";
+                }
+            }
+        }
+    }
+</script>
 {% endblock %}

@@ -1,48 +1,64 @@
 {% extends 'school/base.html' %}
 
-{% block title %}Home - Student List{% endblock %}
+{% block title %}School Dashboard{% endblock %}
 
 {% block content %}
-    <h2>All Students</h2>
+<h2>📊 School Management Dashboard</h2>
 
-    <p>
-        <a href="{% url 'student_create' %}" class="btn">Add New Student</a>
-    </p>
+<div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+    <div style="flex: 1; min-width: 200px; padding: 1rem; background: #f8f9fa; border-radius: 8px; text-align: center;">
+        <h3>Total Students</h3>
+        <p style="font-size: 2rem;">{{ total_students }}</p>
+        <a href="{% url 'student_list' %}" class="btn btn-primary">View Students</a>
+    </div>
+    <div style="flex: 1; min-width: 200px; padding: 1rem; background: #f8f9fa; border-radius: 8px; text-align: center;">
+        <h3>Total Teachers</h3>
+        <p style="font-size: 2rem;">{{ total_teachers }}</p>
+        <a href="{% url 'teacher_list' %}" class="btn btn-primary">View Teachers</a>
+    </div>
+    <div style="flex: 1; min-width: 200px; padding: 1rem; background: #f8f9fa; border-radius: 8px; text-align: center;">
+        <h3>Total Subjects</h3>
+        <p style="font-size: 2rem;">{{ total_subjects }}</p>
+        <a href="{% url 'subject_list' %}" class="btn btn-primary">View Subjects</a>
+    </div>
+    <div style="flex: 1; min-width: 200px; padding: 1rem; background: #f8f9fa; border-radius: 8px; text-align: center;">
+        <h3>Total Classrooms</h3>
+        <p style="font-size: 2rem;">{{ total_classrooms }}</p>
+        <a href="{% url 'classroom_list' %}" class="btn btn-primary">View Classrooms</a>
+    </div>
+</div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Photo</th>
-                <th>Name</th>
-                <th>Classroom</th>
-                <th>Age</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for student in students %}
-            <tr>
-                <td>
-                    {% if student.photo %}
-                        <img src="{{ student.photo.url }}" width="50" height="50" style="border-radius: 4px;">
-                    {% else %}
-                        No Photo
-                    {% endif %}
-                </td>
-                <td>{{ student.name }}</td>
-                <td>{{ student.classroom }}</td>
-                <td>{{ student.age }}</td>
-                <td>
-                    <a href="{% url 'student_detail' student.pk %}" class="btn">View</a>
-                    <a href="{% url 'student_update' student.pk %}" class="btn">Edit</a>
-                    <a href="{% url 'student_delete' student.pk %}" class="btn">Delete</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5">No students available.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<h3>All Students (Recent)</h3>
+<table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+    <thead style="background-color: #f2f2f2;">
+        <tr>
+            <th style="padding: 0.5rem; border: 1px solid #ddd;">Name</th>
+            <th style="padding: 0.5rem; border: 1px solid #ddd;">Gender</th>
+            <th style="padding: 0.5rem; border: 1px solid #ddd;">Classroom</th>
+            <th style="padding: 0.5rem; border: 1px solid #ddd;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for student in students %}
+        <tr>
+            <td style="padding: 0.5rem; border: 1px solid #ddd;">{{ student.name }}</td>
+            <td style="padding: 0.5rem; border: 1px solid #ddd;">{{ student.gender }}</td>
+            <td style="padding: 0.5rem; border: 1px solid #ddd;">
+                {% if student.classroom %}
+                    {{ student.classroom.name }}
+                {% else %}
+                    N/A
+                {% endif %}
+            </td>
+            <td style="padding: 0.5rem; border: 1px solid #ddd;">
+                <a href="{% url 'student_detail' student.pk %}" class="btn btn-sm btn-info">View</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4" style="text-align: center; padding: 1rem;">No students available.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

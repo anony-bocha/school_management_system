@@ -5,11 +5,24 @@ from django.contrib import messages
 
 from .models import ClassRoom, Subject, Teacher, Student
 from .forms import ClassRoomForm, SubjectForm, TeacherForm, StudentForm
-
+from .models import Attendance
+from .forms import AttendanceForm
 # ---------- HOME ----------
 def home(request):
     students = Student.objects.all()
-    return render(request, 'school/home.html', {'students': students})
+    total_students = students.count()
+    total_teachers = Teacher.objects.count()
+    total_subjects = Subject.objects.count()
+    total_classrooms = ClassRoom.objects.count()
+
+    return render(request, 'school/home.html', {
+        'students': students,
+        'total_students': total_students,
+        'total_teachers': total_teachers,
+        'total_subjects': total_subjects,
+        'total_classrooms': total_classrooms,
+    })
+
 
 # ---------- CLASSROOM VIEWS ----------
 def classroom_list(request):
@@ -198,12 +211,8 @@ def student_delete(request, pk):
         return redirect('student_list')
     return render(request, 'school/student_confirm_delete.html', {'student': student})
 
-# ---------- ATTENDANCE VIEWS ----------
-def attendance_list(request):
-    return HttpResponse("Attendance List Placeholder")
 
-def attendance_create(request):
-    return HttpResponse("Attendance Create Placeholder")
+
 
 # ---------- GRADES VIEWS ----------
 def grade_list(request):
@@ -211,3 +220,47 @@ def grade_list(request):
 
 def grade_create(request):
     return HttpResponse("Grade Create Placeholder")
+
+
+# ---------- ATTENDANCE VIEWS ----------
+
+def attendance_list(request):
+    attendances = Attendance.objects.all().order_by('-date')
+
+    query = request.GET.get('q')
+    if query:
+        attendances = attendances.filter(student__name__icontains=query)
+
+    return render(request, 'school/attendance_list.html', {'attendances': attendances})
+
+def attendance_create(request):
+    if request.method == 'POST':
+        form = AttendanceForm(request.POST)
+        if form.is_valid():
+            attendance = form.save()
+            messages.success(request, "Attendance recorded successfully.")
+            return redirect('attendance_list')
+    else:
+        form = AttendanceForm()
+    return render(request, 'school/attendance_form.html', {'form': form, 'title': 'Record Attendance'})
+
+def attendance_update(request, pk):
+    attendance = get_object_or_404(Attendance, pk=pk)
+    if request.method == 'POST':
+        form = AttendanceForm(request.POST, instance=attendance)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Attendance updated successfully.")
+            return redirect('attendance_list')
+    else:
+        form = AttendanceForm(instance=attendance)
+    return render(request, 'school/attendance_form.html', {'form': form, 'title': 'Edit Attendance'})
+
+
+def attendance_delete(request, pk):
+    attendance = get_object_or_404(Attendance, pk=pk)
+    if request.method == 'POST':
+        attendance.delete()
+        messages.success(request, "Attendance deleted successfully.")
+        return redirect('attendance_list')
+    return render(request, 'school/attendance_confirm_delete.html', {'attendance': attendance})

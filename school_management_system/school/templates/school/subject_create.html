@@ -1,18 +1,6 @@
-<!-- school/templates/school/subject_create.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add New Subject</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        h1 { color: #2c3e50; }
-        form { max-width: 400px; }
-        label { display: block; margin-top: 10px; }
-        input, select { width: 100%; padding: 8px; margin-top: 5px; }
-        button { margin-top: 15px; padding: 10px 15px; }
-    </style>
-</head>
-<body>
+{% extends 'school/base.html' %}
+{% block title %}Add student{% endblock %}
+{% block content %}
     <h1>Add New Subject</h1>
 
     <form method="post">
@@ -22,5 +10,4 @@
     </form>
 
     <p><a href="{% url 'subject_list' %}">← Back to Subject List</a></p>
-</body>
-</html>
+{% endblock %}

@@ -1,8 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add New Teacher</title>
-</head>
+{% extends 'school/base.html' %}
+{% block title %}Add new teacher{% endblock %}
+{% block content %}
 <body>
     <h1>Add New Teacher</h1>
 
@@ -15,3 +13,4 @@
     <p><a href="{% url 'teacher_list' %}">← Back to Teacher List</a></p>
 </body>
 </html>
+{% endblock %}

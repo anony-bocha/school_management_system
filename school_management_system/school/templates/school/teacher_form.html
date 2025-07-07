@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ title }}</title>
-</head>
-<body>
+{% extends 'school/base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
     <h2>{{ title }}</h2>
     <form method="post">
         {% csrf_token %}
@@ -11,5 +10,4 @@
         <button type="submit">Save</button>
     </form>
     <p><a href="{% url 'teacher_list' %}">← Back to Teacher List</a></p>
-</body>
-</html>
+{% endblock %}

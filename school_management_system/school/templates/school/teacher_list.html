@@ -5,52 +5,54 @@
 {% block content %}
 <h2>Teachers</h2>
 
-<p>
-    <a href="{% url 'teacher_create' %}" class="btn">+ Add New Teacher</a>
-</p>
+<div style="margin-bottom: 1rem;">
+    <a href="{% url 'teacher_create' %}" class="btn btn-primary">+ Add New Teacher</a>
+</div>
 
-<!-- Search form -->
-<form method="get" style="margin-bottom: 20px;">
-    <input type="text" name="q" placeholder="Search teachers by name" value="{{ request.GET.q }}">
-    <button type="submit" class="btn">Search</button>
-    <a href="{% url 'teacher_list' %}" class="btn">Clear</a>
+<!-- Search Form -->
+<form method="get" style="margin-bottom: 1rem; display: flex; gap: 0.5rem; align-items: center;">
+    <input type="text" name="q" placeholder="Search teachers by name" value="{{ request.GET.q }}" style="flex: 1; padding: 0.5rem;">
+    <button type="submit" class="btn btn-success">Search</button>
+    <a href="{% url 'teacher_list' %}" class="btn btn-secondary">Clear</a>
 </form>
 
 {% if teachers %}
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Gender</th>
-            <th>Subjects</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for teacher in teachers %}
-        <tr>
-            <td>{{ teacher.name }}</td>
-            <td>{{ teacher.gender }}</td>
-            <td>
-                {% for subject in teacher.subjects.all %}
-                    {{ subject.name }}{% if not forloop.last %}, {% endif %}
-                {% empty %}
-                    No subjects
-                {% endfor %}
-            </td>
-            <td>
-                <a href="{% url 'teacher_update' teacher.pk %}" class="btn">Edit</a>
-                <a href="{% url 'teacher_delete' teacher.pk %}" class="btn">Delete</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead style="background-color: #f2f2f2;">
+            <tr>
+                <th style="padding: 0.5rem; border: 1px solid #ddd;">Name</th>
+                <th style="padding: 0.5rem; border: 1px solid #ddd;">Gender</th>
+                <th style="padding: 0.5rem; border: 1px solid #ddd;">Subjects</th>
+                <th style="padding: 0.5rem; border: 1px solid #ddd;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for teacher in teachers %}
+            <tr>
+                <td style="padding: 0.5rem; border: 1px solid #ddd;">{{ teacher.name }}</td>
+                <td style="padding: 0.5rem; border: 1px solid #ddd;">{{ teacher.gender }}</td>
+                <td style="padding: 0.5rem; border: 1px solid #ddd;">
+                    {% for subject in teacher.subjects.all %}
+                        {{ subject.name }}{% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        No subjects
+                    {% endfor %}
+                </td>
+                <td style="padding: 0.5rem; border: 1px solid #ddd;">
+                    <a href="{% url 'teacher_update' teacher.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'teacher_delete' teacher.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% else %}
 <p>No teachers available.</p>
 {% endif %}
 
-<p>
-    <a href="{% url 'classroom_list' %}" class="btn">← Back to Classrooms</a>
-</p>
+<div style="margin-top: 1rem;">
+    <a href="{% url 'classroom_list' %}" class="btn btn-secondary">← Back to Classrooms</a>
+</div>
 {% endblock %}

@@ -33,11 +33,10 @@ urlpatterns = [
     path('students/<int:pk>/edit/', views.student_update, name='student_update'),
     path('students/<int:pk>/delete/', views.student_delete, name='student_delete'),
 
-    # Attendance (later)
-    # path('attendance/', views.attendance_list, name='attendance_list'),
-    # path('attendance/add/', views.attendance_create, name='attendance_create'),
+    # Attendance
+    path('attendance/', views.attendance_list, name='attendance_list'),
+    path('attendance/create/', views.attendance_create, name='attendance_create'),
+    path('attendance/<int:pk>/edit/', views.attendance_update, name='attendance_update'),
+    path('attendance/<int:pk>/delete/', views.attendance_delete, name='attendance_delete'),
 
-    # Grades (later)
-    # path('grades/', views.grade_list, name='grade_list'),
-    # path('grades/add/', views.grade_create, name='grade_create'),
 ]

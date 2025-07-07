@@ -3,6 +3,13 @@ from .models import Subject, ClassRoom
 from .models import Teacher
 
 from .models import Student
+from .models import Attendance
+
+
+class AttendanceForm(forms.ModelForm):
+    class Meta:
+        model = Attendance
+        fields = ['student', 'date', 'status']
 
 
 class StudentForm(forms.ModelForm):

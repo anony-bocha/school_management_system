@@ -36,7 +36,7 @@
 
     <p class="mt-4">
         <a href="{% url 'classroom_update' classroom.pk %}" class="btn btn-warning">✏️ Edit Classroom</a>
-        <a href="{% url 'delete_classroom' classroom.pk %}" class="btn btn-danger">🗑️ Delete Classroom</a>
+        <a href="{% url 'classroom_delete' classroom.pk %}" class="btn btn-danger">🗑️ Delete Classroom</a>
     </p>
 </div>
 {% endblock %}

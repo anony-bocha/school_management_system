@@ -9,13 +9,13 @@ urlpatterns = [
     path('classrooms/', views.classroom_list, name='classroom_list'),
     path('classrooms/<int:pk>/', views.classroom_detail, name='classroom_detail'),
     path('classrooms/<int:pk>/edit/', views.classroom_update, name='classroom_update'),
-    path('classrooms/<int:pk>/delete/', views.delete_classroom, name='delete_classroom'),
+    path('classrooms/<int:pk>/delete/', views.classroom_delete, name='classroom_delete'),
     path('classrooms/create/', views.classroom_create, name='classroom_create'),
+
     # Subjects
     path('subjects/', views.subject_list, name='subject_list'),
     path('subjects/<int:pk>/', views.subject_detail, name='subject_detail'),
     path('subjects/add/', views.subject_create, name='subject_create'),
-
     path('subjects/<int:pk>/edit/', views.subject_update, name='subject_update'),
     path('subjects/<int:pk>/delete/', views.subject_delete, name='subject_delete'),
 
@@ -34,10 +34,10 @@ urlpatterns = [
     path('students/<int:pk>/delete/', views.student_delete, name='student_delete'),
 
     # Attendance (later)
-    #path('attendance/', views.attendance_list, name='attendance_list'),
-    #path('attendance/add/', views.attendance_create, name='attendance_create'),
+    # path('attendance/', views.attendance_list, name='attendance_list'),
+    # path('attendance/add/', views.attendance_create, name='attendance_create'),
 
     # Grades (later)
-    #path('grades/', views.grade_list, name='grade_list'),
-    #path('grades/add/', views.grade_create, name='grade_create'),
+    # path('grades/', views.grade_list, name='grade_list'),
+    # path('grades/add/', views.grade_create, name='grade_create'),
 ]

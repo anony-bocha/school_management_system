@@ -9,6 +9,13 @@
     <a href="{% url 'teacher_create' %}" class="btn">+ Add New Teacher</a>
 </p>
 
+<!-- Search form -->
+<form method="get" style="margin-bottom: 20px;">
+    <input type="text" name="q" placeholder="Search teachers by name" value="{{ request.GET.q }}">
+    <button type="submit" class="btn">Search</button>
+    <a href="{% url 'teacher_list' %}" class="btn">Clear</a>
+</form>
+
 {% if teachers %}
 <table>
     <thead>

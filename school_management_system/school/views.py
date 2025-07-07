@@ -1,11 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 from django.urls import reverse
 from django.contrib import messages
 
 from .models import ClassRoom, Subject, Teacher, Student
 from .forms import ClassRoomForm, SubjectForm, TeacherForm, StudentForm
-
 
 # ---------- HOME ----------
 def home(request):
@@ -21,19 +20,18 @@ def classroom_detail(request, pk):
     classroom = get_object_or_404(ClassRoom, pk=pk)
     students = Student.objects.filter(classroom=classroom)
     subjects = Subject.objects.filter(classroom=classroom)
-    context = {
+    return render(request, 'school/classroom_detail.html', {
         'classroom': classroom,
         'students': students,
         'subjects': subjects,
-    }
-    return render(request, 'school/classroom_detail.html', context)
+    })
 
 def classroom_create(request):
     if request.method == 'POST':
         form = ClassRoomForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Classroom created successfully.")
+            classroom = form.save()
+            messages.success(request, f"Classroom '{classroom.name}' created successfully.")
             return redirect('classroom_list')
     else:
         form = ClassRoomForm()
@@ -44,8 +42,8 @@ def classroom_update(request, pk):
     if request.method == 'POST':
         form = ClassRoomForm(request.POST, instance=classroom)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Classroom updated successfully.")
+            classroom = form.save()
+            messages.success(request, f"Classroom '{classroom.name}' updated successfully.")
             return redirect('classroom_detail', pk=classroom.pk)
     else:
         form = ClassRoomForm(instance=classroom)
@@ -55,14 +53,18 @@ def classroom_delete(request, pk):
     classroom = get_object_or_404(ClassRoom, pk=pk)
     if request.method == 'POST':
         classroom.delete()
-        messages.success(request, "Classroom deleted successfully.")
+        messages.success(request, f"Classroom '{classroom.name}' deleted successfully.")
         return redirect('classroom_list')
     return render(request, 'school/classroom_confirm_delete.html', {'classroom': classroom})
 
 # ---------- SUBJECT VIEWS ----------
 def subject_list(request):
     subjects = Subject.objects.all()
+    query = request.GET.get('q')
+    if query:
+        subjects = subjects.filter(name__icontains=query) | subjects.filter(teacher__name__icontains=query)
     return render(request, 'school/subject_list.html', {'subjects': subjects})
+
 
 def subject_detail(request, pk):
     subject = get_object_or_404(Subject, pk=pk)
@@ -72,8 +74,8 @@ def subject_create(request):
     if request.method == 'POST':
         form = SubjectForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Subject created successfully.")
+            subject = form.save()
+            messages.success(request, f"Subject '{subject.name}' created successfully.")
             return redirect('subject_list')
     else:
         form = SubjectForm()
@@ -84,9 +86,9 @@ def subject_update(request, pk):
     if request.method == 'POST':
         form = SubjectForm(request.POST, instance=subject)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Subject updated successfully.")
-            return redirect('subject_list')
+            subject = form.save()
+            messages.success(request, f"Subject '{subject.name}' updated successfully.")
+            return redirect('subject_detail', pk=subject.pk)
     else:
         form = SubjectForm(instance=subject)
     return render(request, 'school/subject_form.html', {'form': form, 'title': 'Edit Subject'})
@@ -95,14 +97,18 @@ def subject_delete(request, pk):
     subject = get_object_or_404(Subject, pk=pk)
     if request.method == 'POST':
         subject.delete()
-        messages.success(request, "Subject deleted successfully.")
+        messages.success(request, f"Subject '{subject.name}' deleted successfully.")
         return redirect('subject_list')
     return render(request, 'school/subject_confirm_delete.html', {'subject': subject})
 
-# ---------- TEACHER VIEWS ----------
+# ---------- TEACHER VIEWS ----------def teacher_list(request):
 def teacher_list(request):
     teachers = Teacher.objects.all()
+    query = request.GET.get('q')
+    if query:
+        teachers = teachers.filter(name__icontains=query)
     return render(request, 'school/teacher_list.html', {'teachers': teachers})
+
 
 def teacher_detail(request, pk):
     teacher = get_object_or_404(Teacher, pk=pk)
@@ -112,8 +118,8 @@ def teacher_create(request):
     if request.method == 'POST':
         form = TeacherForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Teacher created successfully.")
+            teacher = form.save()
+            messages.success(request, f"Teacher '{teacher.name}' created successfully.")
             return redirect('teacher_list')
     else:
         form = TeacherForm()
@@ -124,9 +130,9 @@ def teacher_update(request, pk):
     if request.method == 'POST':
         form = TeacherForm(request.POST, instance=teacher)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Teacher updated successfully.")
-            return redirect('teacher_list')
+            teacher = form.save()
+            messages.success(request, f"Teacher '{teacher.name}' updated successfully.")
+            return redirect('teacher_detail', pk=teacher.pk)
     else:
         form = TeacherForm(instance=teacher)
     return render(request, 'school/teacher_form.html', {'form': form, 'title': 'Edit Teacher'})
@@ -135,14 +141,27 @@ def teacher_delete(request, pk):
     teacher = get_object_or_404(Teacher, pk=pk)
     if request.method == 'POST':
         teacher.delete()
-        messages.success(request, "Teacher deleted successfully.")
+        messages.success(request, f"Teacher '{teacher.name}' deleted successfully.")
         return redirect('teacher_list')
     return render(request, 'school/teacher_delete_confirm.html', {'teacher': teacher})
 
 # ---------- STUDENT VIEWS ----------
 def student_list(request):
     students = Student.objects.all()
-    return render(request, 'school/student_list.html', {'students': students})
+    query = request.GET.get('q')
+    classroom_id = request.GET.get('classroom')
+
+    if query:
+        students = students.filter(name__icontains=query)
+    if classroom_id:
+        students = students.filter(classroom_id=classroom_id)
+
+    classrooms = ClassRoom.objects.all()
+    return render(request, 'school/student_list.html', {
+        'students': students,
+        'classrooms': classrooms
+    })
+
 
 def student_detail(request, pk):
     student = get_object_or_404(Student, pk=pk)
@@ -152,8 +171,8 @@ def student_create(request):
     if request.method == 'POST':
         form = StudentForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Student created successfully.")
+            student = form.save()
+            messages.success(request, f"Student '{student.name}' created successfully.")
             return redirect('student_list')
     else:
         form = StudentForm()
@@ -164,9 +183,9 @@ def student_update(request, pk):
     if request.method == 'POST':
         form = StudentForm(request.POST, request.FILES, instance=student)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Student updated successfully.")
-            return redirect('student_list')
+            student = form.save()
+            messages.success(request, f"Student '{student.name}' updated successfully.")
+            return redirect('student_detail', pk=student.pk)
     else:
         form = StudentForm(instance=student)
     return render(request, 'school/student_form.html', {'form': form, 'title': 'Edit Student'})
@@ -175,7 +194,7 @@ def student_delete(request, pk):
     student = get_object_or_404(Student, pk=pk)
     if request.method == 'POST':
         student.delete()
-        messages.success(request, "Student deleted successfully.")
+        messages.success(request, f"Student '{student.name}' deleted successfully.")
         return redirect('student_list')
     return render(request, 'school/student_confirm_delete.html', {'student': student})
 

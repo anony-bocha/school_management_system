@@ -1,25 +1,26 @@
 {% extends 'school/base.html' %}
-{% block title %}class Room list{% endblock %}
-{% block content %}<!-- school/templates/school/classroom_list.html -->
+{% block title %}Classroom List{% endblock %}
+{% block content %}
 
-    <h1>Classrooms</h1>
+<h1>Classrooms</h1>
 
-   <p> <a href="{% url 'classroom_create' %}">+ Add New Classroom</a></p>
+<p><a href="{% url 'classroom_create' %}" class="btn">+ Add New Classroom</a></p>
 
-    <ul>
-        {% for classroom in classrooms %}
-        <li>
-            <a href="{% url 'classroom_detail' classroom.pk %}">{{ classroom.name }} - Section {{ classroom.section }}</a>
-            |
-            <a href="{% url 'classroom_update' classroom.pk %}">Edit</a>
+{% if classrooms %}
+<ul>
+    {% for classroom in classrooms %}
+    <li>
+        <a href="{% url 'classroom_detail' classroom.pk %}">
+            {{ classroom.name }} - Section {{ classroom.section }}
+        </a>
+        |
+        <a href="{% url 'classroom_update' classroom.pk %}" class="btn">Edit</a> |
+        <a href="{% url 'classroom_delete' classroom.pk %}" class="btn">Delete</a>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No classrooms available.</p>
+{% endif %}
 
-            |
-            <a href="{% url 'classroom_delete' classroom.pk %}">Delete Classroom</a>
-
-        </li>
-        {% empty %}
-        <li>No classrooms available.</li>
-        {% endfor %}
-    </ul>
-
-    {% endblock %}
+{% endblock %}

@@ -1,29 +1,48 @@
 {% extends 'school/base.html' %}
 {% block title %}Subject List{% endblock %}
+
 {% block content %}
-    <h1>Subjects</h1>
-    <a href="{% url 'subject_create' %}">Add New Subject</a>
-    <table border="1">
+<h1>Subjects</h1>
+
+<p>
+    <a href="{% url 'subject_create' %}" class="btn">+ Add New Subject</a>
+</p>
+
+<!-- Search form -->
+<form method="get" style="margin-bottom: 20px;">
+    <input type="text" name="q" placeholder="Search by subject or teacher name" value="{{ request.GET.q }}">
+    <button type="submit" class="btn">Search</button>
+    <a href="{% url 'subject_list' %}" class="btn">Clear</a>
+</form>
+
+<table>
+    <thead>
         <tr>
             <th>Name</th>
             <th>Classroom</th>
+            <th>Teacher</th>
             <th>Actions</th>
         </tr>
+    </thead>
+    <tbody>
         {% for subject in subjects %}
         <tr>
             <td>{{ subject.name }}</td>
-            <td>{{ subject.classroom }}</td>
+            <td>{{ subject.classroom.name }} - {{ subject.classroom.section }}</td>
+            <td>{{ subject.teacher.name }}</td>
             <td>
-                <a href="{% url 'subject_detail' subject.pk %}">View</a> |
-                <a href="{% url 'subject_update' subject.pk %}">Edit</a> |
-                <a href="{% url 'subject_delete' subject.pk %}">Delete</a>
+                <a href="{% url 'subject_detail' subject.pk %}" class="btn">View</a>
+                <a href="{% url 'subject_update' subject.pk %}" class="btn">Edit</a>
+                <a href="{% url 'subject_delete' subject.pk %}" class="btn">Delete</a>
             </td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan="3">No subjects available.</td>
+            <td colspan="4">No subjects available.</td>
         </tr>
         {% endfor %}
-    </table>
-    <p><a href="{% url 'home' %}">Back to Home</a></p>
+    </tbody>
+</table>
+
+<p><a href="{% url 'home' %}" class="btn">Back to Home</a></p>
 {% endblock %}

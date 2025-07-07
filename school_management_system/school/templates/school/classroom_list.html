@@ -7,18 +7,31 @@
 <p><a href="{% url 'classroom_create' %}" class="btn">+ Add New Classroom</a></p>
 
 {% if classrooms %}
-<ul>
-    {% for classroom in classrooms %}
-    <li>
-        <a href="{% url 'classroom_detail' classroom.pk %}">
-            {{ classroom.name }} - Section {{ classroom.section }}
-        </a>
-        |
-        <a href="{% url 'classroom_update' classroom.pk %}" class="btn">Edit</a> |
-        <a href="{% url 'classroom_delete' classroom.pk %}" class="btn">Delete</a>
-    </li>
-    {% endfor %}
-</ul>
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Section</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for classroom in classrooms %}
+        <tr>
+            <td>
+                <a href="{% url 'classroom_detail' classroom.pk %}">
+                    {{ classroom.name }}
+                </a>
+            </td>
+            <td>{{ classroom.section }}</td>
+            <td>
+                <a href="{% url 'classroom_update' classroom.pk %}" class="btn">Edit</a>
+                <a href="{% url 'classroom_delete' classroom.pk %}" class="btn">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% else %}
 <p>No classrooms available.</p>
 {% endif %}

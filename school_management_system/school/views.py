@@ -5,10 +5,13 @@ from .forms import ClassRoomForm
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from .forms import SubjectForm
-from .models import Teacher
 from .forms import TeacherForm
 
 from .forms import StudentForm
+
+
+
+
 
 
 
@@ -22,7 +25,9 @@ def delete_classroom(request, pk):
 
 # Home page (students listing for now)
 def home(request):
-    return HttpResponse("Home Page - Students List Placeholder")
+    students = Student.objects.all()
+    return render(request, 'school/home.html', {'students': students})
+
 
 # ---------- CLASSROOM VIEWS ----------
 def classroom_list(request):
@@ -70,6 +75,8 @@ def classroom_delete(request, pk):
 
 # ---------- SUBJECT VIEWS ----------
 
+
+# SUBJECT LIST
 def subject_list(request):
     subjects = Subject.objects.all()
     return render(request, 'school/subject_list.html', {'subjects': subjects})
@@ -79,6 +86,7 @@ def subject_detail(request, pk):
     return render(request, 'school/subject_detail.html', {'subject': subject})
 
 
+# SUBJECT CREATE
 def subject_create(request):
     if request.method == 'POST':
         form = SubjectForm(request.POST)
@@ -87,13 +95,27 @@ def subject_create(request):
             return redirect('subject_list')
     else:
         form = SubjectForm()
-    return render(request, 'school/subject_create.html', {'form': form})
+    return render(request, 'school/subject_form.html', {'form': form, 'title': 'Add Subject'})
 
+# SUBJECT UPDATE
 def subject_update(request, pk):
-    return HttpResponse(f"Subject Update Placeholder for ID {pk}")
+    subject = get_object_or_404(Subject, pk=pk)
+    if request.method == 'POST':
+        form = SubjectForm(request.POST, instance=subject)
+        if form.is_valid():
+            form.save()
+            return redirect('subject_list')
+    else:
+        form = SubjectForm(instance=subject)
+    return render(request, 'school/subject_form.html', {'form': form, 'title': 'Edit Subject'})
 
+# SUBJECT DELETE
 def subject_delete(request, pk):
-    return HttpResponse(f"Subject Delete Placeholder for ID {pk}")
+    subject = get_object_or_404(Subject, pk=pk)
+    if request.method == 'POST':
+        subject.delete()
+        return redirect('subject_list')
+    return render(request, 'school/subject_confirm_delete.html', {'subject': subject})
 
 # ---------- TEACHER VIEWS ----------
 def teacher_list(request):

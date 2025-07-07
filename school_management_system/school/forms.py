@@ -4,6 +4,7 @@ from .models import Teacher
 
 from .models import Student
 
+
 class StudentForm(forms.ModelForm):
     class Meta:
         model = Student
@@ -21,6 +22,7 @@ class SubjectForm(forms.ModelForm):
     class Meta:
         model = Subject
         fields = ['name', 'classroom']
+      
 
 class ClassRoomForm(forms.ModelForm):
     class Meta:

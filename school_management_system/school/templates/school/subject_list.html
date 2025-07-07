@@ -1,26 +1,29 @@
-<!-- school/templates/school/subject_list.html -->
 {% extends 'school/base.html' %}
-{% block title %}class Room list{% endblock %}
+{% block title %}Subject List{% endblock %}
 {% block content %}
     <h1>Subjects</h1>
-
-    <p><a href="{% url 'subject_create' %}">+ Add New Subject</a></p>
-
-    {% if subjects %}
-        <ul>
-            {% for subject in subjects %}
-                <li>
-                    <a href="{% url 'subject_detail' subject.pk %}">{{ subject.name }}</a>
-                    - Classroom:
-                    <a href="{% url 'classroom_detail' subject.classroom.pk %}">
-                        {{ subject.classroom.name }} {{ subject.classroom.section }}
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No subjects available.</p>
-    {% endif %}
-
-    <p><a href="{% url 'classroom_list' %}">← Back to Classroom List</a></p>
+    <a href="{% url 'subject_create' %}">Add New Subject</a>
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Classroom</th>
+            <th>Actions</th>
+        </tr>
+        {% for subject in subjects %}
+        <tr>
+            <td>{{ subject.name }}</td>
+            <td>{{ subject.classroom }}</td>
+            <td>
+                <a href="{% url 'subject_detail' subject.pk %}">View</a> |
+                <a href="{% url 'subject_update' subject.pk %}">Edit</a> |
+                <a href="{% url 'subject_delete' subject.pk %}">Delete</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3">No subjects available.</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <p><a href="{% url 'home' %}">Back to Home</a></p>
 {% endblock %}

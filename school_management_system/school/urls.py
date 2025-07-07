@@ -34,9 +34,9 @@ urlpatterns = [
     path('students/<int:pk>/delete/', views.student_delete, name='student_delete'),
 
     # Attendance
-    path('attendance/', views.attendance_list, name='attendance_list'),
-    path('attendance/create/', views.attendance_create, name='attendance_create'),
-    path('attendance/<int:pk>/edit/', views.attendance_update, name='attendance_update'),
-    path('attendance/<int:pk>/delete/', views.attendance_delete, name='attendance_delete'),
+    path('attendances/', views.attendance_list, name='attendance_list'),
+    path('attendances/create/', views.attendance_create, name='attendance_create'),
+    path('attendances/<int:pk>/edit/', views.attendance_update, name='attendance_update'),
+    path('attendances/<int:pk>/delete/', views.attendance_delete, name='attendance_delete'),
 
 ]

@@ -6,10 +6,16 @@ from .models import Student
 from .models import Attendance
 
 
+
 class AttendanceForm(forms.ModelForm):
     class Meta:
         model = Attendance
         fields = ['student', 'date', 'status']
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+
 
 
 class StudentForm(forms.ModelForm):

@@ -1,30 +1,49 @@
 {% extends 'school/base.html' %}
-{% block title %}Teachers list{% endblock %}
-{% block content %}<
-    <h1>Teachers</h1>
 
-    <p><a href="{% url 'teacher_create' %}">+ Add New Teacher</a></p>
+{% block title %}Teachers List{% endblock %}
 
-    {% if teachers %}
-        <ul>
-            {% for teacher in teachers %}
-                <li>
-                    {{ teacher.name }} ({{ teacher.gender }})
-                    - Subjects:
-                    {% for subject in teacher.subjects.all %}
-                        {{ subject.name }}{% if not forloop.last %}, {% endif %}
-                    {% empty %}
-                        No subjects
-                    {% endfor %}
-                    |
-                    <a href="{% url 'teacher_update' teacher.pk %}">Edit</a> |
-                    <a href="{% url 'teacher_delete' teacher.pk %}">Delete</a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No teachers available.</p>
-    {% endif %}
+{% block content %}
+<h2>Teachers</h2>
 
-    <p><a href="{% url 'classroom_list' %}">← Back to Classrooms</a></p>
+<p>
+    <a href="{% url 'teacher_create' %}" class="btn">+ Add New Teacher</a>
+</p>
+
+{% if teachers %}
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Gender</th>
+            <th>Subjects</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for teacher in teachers %}
+        <tr>
+            <td>{{ teacher.name }}</td>
+            <td>{{ teacher.gender }}</td>
+            <td>
+                {% for subject in teacher.subjects.all %}
+                    {{ subject.name }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                    No subjects
+                {% endfor %}
+            </td>
+            <td>
+                <a href="{% url 'teacher_update' teacher.pk %}" class="btn">Edit</a>
+                <a href="{% url 'teacher_delete' teacher.pk %}" class="btn">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No teachers available.</p>
+{% endif %}
+
+<p>
+    <a href="{% url 'classroom_list' %}" class="btn">← Back to Classrooms</a>
+</p>
 {% endblock %}

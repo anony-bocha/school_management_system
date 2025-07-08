@@ -72,7 +72,7 @@ class Student(models.Model):
 class Attendance(models.Model):
     STATUS_CHOICES = [('Present', 'Present'), ('Absent', 'Absent')]
 
-    student = models.ForeignKey('Student', on_delete=models.CASCADE, related_name='attendances')
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='attendances')
     date = models.DateField()
     status = models.CharField(max_length=10, choices=STATUS_CHOICES)
 

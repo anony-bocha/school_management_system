@@ -3,24 +3,24 @@
 {% block title %}Teacher: {{ teacher.name }}{% endblock %}
 
 {% block content %}
-    <h2>Teacher: {{ teacher.name }}</h2>
-    <p><strong>Gender:</strong> {{ teacher.gender }}</p>
-    <p><strong>Contact:</strong> {{ teacher.contact }}</p>
+<h2>Teacher: {{ teacher.name }}</h2>
+<p><strong>Gender:</strong> {{ teacher.gender }}</p>
+<p><strong>Contact:</strong> {{ teacher.contact }}</p>
 
-    <h3>Subjects</h3>
-    {% if teacher.subjects.all %}
-        <ul>
-            {% for subject in teacher.subjects.all %}
-                <li>{{ subject.name }} ({{ subject.code }})</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No subjects assigned.</p>
-    {% endif %}
+<h3>Subjects</h3>
+{% if teacher.subjects.exists %}
+    <ul>
+        {% for subject in teacher.subjects.all %}
+            <li>{{ subject.name }} ({{ subject.code }})</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No subjects assigned.</p>
+{% endif %}
 
-    <div style="margin-top: 1rem;">
-        <a href="{% url 'teacher_update' teacher.pk %}" class="btn btn-warning">Edit</a>
-        <a href="{% url 'teacher_delete_confirm' teacher.pk %}" class="btn btn-danger">Delete</a>
-        <a href="{% url 'teacher_list' %}" class="btn btn-secondary">← Back to Teacher List</a>
-    </div>
+<div class="mt-3 d-flex gap-2">
+    <a href="{% url 'teacher_update' teacher.pk %}" class="btn btn-warning">Edit</a>
+    <a href="{% url 'teacher_delete_confirm' teacher.pk %}" class="btn btn-danger">Delete</a>
+    <a href="{% url 'teacher_list' %}" class="btn btn-secondary">← Back to Teacher List</a>
+</div>
 {% endblock %}

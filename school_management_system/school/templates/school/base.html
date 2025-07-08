@@ -4,12 +4,13 @@
 <head>
     <meta charset="UTF-8" />
     <title>{% block title %}School Management{% endblock %}</title>
-    <!-- Bootstrap 5 CDN -->
+
+    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <style>
-        /* (all your styles unchanged) */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             max-width: 900px;
@@ -48,7 +49,6 @@
             padding: 8px 14px;
             border-radius: 5px;
             transition: background-color 0.3s ease;
-            user-select: none;
             cursor: pointer;
             text-decoration: none;
             border: none;
@@ -71,7 +71,6 @@
             color: white;
             font-size: 1.8rem;
             cursor: pointer;
-            user-select: none;
             padding: 8px;
             margin-left: auto;
         }
@@ -100,7 +99,6 @@
             text-align: center;
             color: #777;
             font-size: 14px;
-            user-select: none;
         }
         .messages {
             margin-bottom: 20px;
@@ -119,6 +117,7 @@
             border: 1px solid #f5c6cb;
         }
     </style>
+
     {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -128,13 +127,13 @@
             <button class="menu-toggle ms-auto" aria-label="Toggle Menu" aria-expanded="false">&#9776;</button>
         </div>
         <nav>
-            <a href="{% url 'school:home' %}" class="{% if request.path == '/' %}active{% endif %}">Home</a>
-            <a href="{% url 'school:classroom_list' %}" class="{% if 'classrooms' in request.path %}active{% endif %}">Classrooms</a>
-            <a href="{% url 'school:teacher_list' %}" class="{% if 'teachers' in request.path %}active{% endif %}">Teachers</a>
-            <a href="{% url 'school:student_list' %}" class="{% if 'students' in request.path %}active{% endif %}">Students</a>
-            <a href="{% url 'school:subject_list' %}" class="{% if 'subjects' in request.path %}active{% endif %}">Subjects</a>
+            <a href="{% url 'school:home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a>
+            <a href="{% url 'school:classroom_list' %}" class="{% if 'classroom' in request.path %}active{% endif %}">Classrooms</a>
+            <a href="{% url 'school:teacher_list' %}" class="{% if 'teacher' in request.path %}active{% endif %}">Teachers</a>
+            <a href="{% url 'school:student_list' %}" class="{% if 'student' in request.path %}active{% endif %}">Students</a>
+            <a href="{% url 'school:subject_list' %}" class="{% if 'subject' in request.path %}active{% endif %}">Subjects</a>
             <a href="{% url 'school:attendance_list' %}" class="{% if 'attendance' in request.path %}active{% endif %}">Attendance</a>
-            <a href="{% url 'school:grade_list' %}" class="{% if 'grades' in request.path %}active{% endif %}">Grades</a>
+            <a href="{% url 'school:grade_list' %}" class="{% if 'grade' in request.path %}active{% endif %}">Grades</a>
 
             {% if user.is_authenticated %}
                 <form id="logout-form" action="{% url 'school:logout' %}" method="post" style="display:inline;">
@@ -160,7 +159,7 @@
     </main>
 
     <footer>
-        &copy; {{ now|date:"Y" }} School Management System. All rights reserved.
+        &copy; {% now "Y" %} School Management System. All rights reserved.
     </footer>
 
     <script>

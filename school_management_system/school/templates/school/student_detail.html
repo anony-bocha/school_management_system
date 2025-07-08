@@ -1,22 +1,33 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ student.name }}</title>
-</head>
-<body>
+{% extends 'school/base.html' %}
+{% block title %}{{ student.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
     <h2>{{ student.name }}</h2>
-    <p>Age: {{ student.age }}</p>
-    <p>Gender: {{ student.gender }}</p>
-    <p>Address: {{ student.address }}</p>
-    <p>Classroom: {{ student.classroom }}</p>
+    <div class="mb-3">
+        <strong>Age:</strong> {{ student.age }}
+    </div>
+    <div class="mb-3">
+        <strong>Gender:</strong> {{ student.gender }}
+    </div>
+    <div class="mb-3">
+        <strong>Address:</strong> {{ student.address }}
+    </div>
+    <div class="mb-3">
+        <strong>Classroom:</strong> {{ student.classroom }}
+    </div>
+
     {% if student.photo %}
-        <p>Photo:</p>
-        <img src="{{ student.photo.url }}" alt="Photo of {{ student.name }}" width="150">
+        <div class="mb-3">
+            <strong>Photo:</strong><br>
+            <img src="{{ student.photo.url }}" alt="Photo of {{ student.name }}" class="img-thumbnail" width="150">
+        </div>
     {% endif %}
+
     <p>
-        <a href="{% url 'school:student_update' student.pk %}">Edit</a> |
-        <a href="{% url 'school:student_delete' student.pk %}">Delete</a> |
-        <a href="{% url 'school:student_list' %}">Back to List</a>
+        <a href="{% url 'school:student_update' student.pk %}" class="btn btn-warning me-2">Edit</a>
+        <a href="{% url 'school:student_delete' student.pk %}" class="btn btn-danger me-2">Delete</a>
+        <a href="{% url 'school:student_list' %}" class="btn btn-secondary">Back to List</a>
     </p>
-</body>
-</html>
+</div>
+{% endblock %}

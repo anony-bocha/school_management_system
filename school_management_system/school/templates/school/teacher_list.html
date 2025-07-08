@@ -5,42 +5,41 @@
 {% block content %}
 <h2>Teachers</h2>
 
-<div style="margin-bottom: 1rem;">
+<div class="mb-3">
     <a href="{% url 'teacher_create' %}" class="btn btn-primary">+ Add New Teacher</a>
 </div>
 
 <!-- Search Form -->
-<form method="get" style="margin-bottom: 1rem; display: flex; gap: 0.5rem; align-items: center;">
-    <input type="text" name="q" placeholder="Search teachers by name" value="{{ query }}" style="flex: 1; padding: 0.5rem;">
+<form method="get" class="d-flex gap-2 align-items-center mb-3">
+    <input type="text" name="q" placeholder="Search teachers by name" value="{{ query }}" class="form-control flex-grow-1" />
     <button type="submit" class="btn btn-success">Search</button>
     <a href="{% url 'teacher_list' %}" class="btn btn-secondary">Clear</a>
 </form>
 
-
 {% if teachers %}
-<div style="overflow-x: auto;">
-    <table style="width: 100%; border-collapse: collapse;">
-        <thead style="background-color: #f2f2f2;">
+<div class="table-responsive">
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
             <tr>
-                <th style="padding: 0.5rem; border: 1px solid #ddd;">Name</th>
-                <th style="padding: 0.5rem; border: 1px solid #ddd;">Gender</th>
-                <th style="padding: 0.5rem; border: 1px solid #ddd;">Subjects</th>
-                <th style="padding: 0.5rem; border: 1px solid #ddd;">Actions</th>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>Subjects</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for teacher in teachers %}
             <tr>
-                <td style="padding: 0.5rem; border: 1px solid #ddd;">{{ teacher.name }}</td>
-                <td style="padding: 0.5rem; border: 1px solid #ddd;">{{ teacher.gender }}</td>
-                <td style="padding: 0.5rem; border: 1px solid #ddd;">
+                <td>{{ teacher.name }}</td>
+                <td>{{ teacher.gender }}</td>
+                <td>
                     {% for subject in teacher.subjects.all %}
                         {{ subject.name }}{% if not forloop.last %}, {% endif %}
                     {% empty %}
                         No subjects
                     {% endfor %}
                 </td>
-                <td style="padding: 0.5rem; border: 1px solid #ddd;">
+                <td>
                     <a href="{% url 'teacher_update' teacher.pk %}" class="btn btn-sm btn-warning">Edit</a>
                     <a href="{% url 'teacher_delete' teacher.pk %}" class="btn btn-sm btn-danger">Delete</a>
                 </td>
@@ -53,7 +52,7 @@
 <p>No teachers available.</p>
 {% endif %}
 
-<div style="margin-top: 1rem;">
+<div class="mt-3">
     <a href="{% url 'classroom_list' %}" class="btn btn-secondary">← Back to Classrooms</a>
 </div>
 {% endblock %}

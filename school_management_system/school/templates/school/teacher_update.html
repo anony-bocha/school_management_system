@@ -1,17 +1,17 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Edit Teacher - {{ teacher.name }}</title>
-</head>
-<body>
-    <h1>Edit Teacher: {{ teacher.name }}</h1>
+{% extends 'school/base.html' %}
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Save Changes</button>
-    </form>
+{% block title %}Edit Teacher - {{ teacher.name }}{% endblock %}
 
-    <p><a href="{% url 'teacher_detail' teacher.pk %}">Back to Teacher Detail</a></p>
-</body>
-</html>
+{% block content %}
+<h1>Edit Teacher: {{ teacher.name }}</h1>
+
+<form method="post" class="mb-3">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+</form>
+
+<p>
+    <a href="{% url 'teacher_detail' teacher.pk %}" class="btn btn-secondary">Back to Teacher Detail</a>
+</p>
+{% endblock %}

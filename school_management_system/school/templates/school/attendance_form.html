@@ -1,11 +1,24 @@
 {% extends 'school/base.html' %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
-<h2>{{ title }}</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn">Save</button>
-</form>
-<p><a href="{% url 'attendance_list' %}" class="btn">← Back to Attendance List</a></p>
+
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="mb-4">{{ title }}</h2>
+
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle"></i> Save
+                </button>
+                <a href="{% url 'school:attendance_list' %}" class="btn btn-secondary ms-2">
+                    ← Back to Attendance List
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

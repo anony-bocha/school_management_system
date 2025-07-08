@@ -1,13 +1,13 @@
-<!-- school/templates/school/classroom_update.html -->
-
 {% extends 'school/base.html' %}
-{% block title %}Classroom: {{ classroom.name }} {{ classroom.section }}{% endblock %}
+{% block title %}Update Classroom: {{ classroom.name }} {{ classroom.section }}{% endblock %}
+
 {% block content %}
-<h1>Update Classroom</h1>
-<form method="post">
+<h1 class="mb-4">Update Classroom</h1>
+
+<form method="post" class="mb-3">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Update Classroom</button>
+    <button type="submit" class="btn btn-primary">Update Classroom</button>
+    <a href="{% url 'school:classroom_list' %}" class="btn btn-secondary ms-2">Back to Classroom List</a>
 </form>
-<p><a href="{% url 'school:classroom_list' %}">Back to Classroom List</a></p>
 {% endblock %}

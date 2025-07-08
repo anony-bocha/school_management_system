@@ -1,11 +1,14 @@
-{% extends 'base.html' %}
+{% extends 'school/base.html' %}
+
+{% block title %}Delete Classroom{% endblock %}
+
 {% block content %}
 <h2>Delete Classroom</h2>
 <p>Are you sure you want to delete the classroom: <strong>{{ classroom.name }} {{ classroom.section }}</strong>?</p>
 
-<form method="post">
+<form method="post" class="mt-3">
     {% csrf_token %}
-    <button type="submit">Confirm Delete</button>
-    <a href="{% url 'school:classroom_list' %}">Cancel</a>
+    <button type="submit" class="btn btn-danger">Confirm Delete</button>
+    <a href="{% url 'school:classroom_list' %}" class="btn btn-secondary">Cancel</a>
 </form>
 {% endblock %}

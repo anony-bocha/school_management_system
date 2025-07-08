@@ -2,32 +2,36 @@
 {% block title %}Grades List{% endblock %}
 {% block content %}
 <h2>Grades</h2>
-<p><a href="{% url 'school:grade_create' %}" class="btn">+ Add Grade</a></p>
-<table>
-    <thead>
-        <tr>
-            <th>Student</th>
-            <th>Subject</th>
-            <th>Marks</th>
-            <th>Grade</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for grade in grades %}
-        <tr>
-            <td>{{ grade.student.name }}</td>
-            <td>{{ grade.subject.name }}</td>
-            <td>{{ grade.marks }}</td>
-            <td>{{ grade.grade }}</td>
-            <td>
-                <a href="{% url 'school:grade_update' grade.pk %}" class="btn btn-sm">Edit</a>
-                <a href="{% url 'school:grade_delete' grade.pk %}" class="btn btn-sm">Delete</a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="5">No grades found.</td></tr>
-        {% endfor %}
-    </tbody>
-</table>
+<p><a href="{% url 'school:grade_create' %}" class="btn btn-primary mb-3">+ Add Grade</a></p>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover rounded shadow-sm bg-white">
+        <thead class="table-primary">
+            <tr>
+                <th>Student</th>
+                <th>Subject</th>
+                <th>Marks</th>
+                <th>Grade</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for grade in grades %}
+            <tr>
+                <td>{{ grade.student.name }}</td>
+                <td>{{ grade.subject.name }}</td>
+                <td>{{ grade.marks }}</td>
+                <td>{{ grade.grade }}</td>
+                <td>
+                    <a href="{% url 'school:grade_update' grade.pk %}" class="btn btn-sm btn-warning me-1">Edit</a>
+                    <a href="{% url 'school:grade_delete' grade.pk %}" class="btn btn-sm btn-danger"
+                       onclick="return confirm('Are you sure you want to delete this grade?');">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center">No grades found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

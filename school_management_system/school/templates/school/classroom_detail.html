@@ -1,28 +1,29 @@
-<!-- school/templates/school/classroom_detail.html -->
-
 {% extends 'school/base.html' %}
+
 {% block title %}Classroom: {{ classroom.name }}{% endblock %}
 
 {% block content %}
-<h1>Classroom: {{ classroom.name }}</h1>
-<p>Section: {{ classroom.section }}</p>
+<h1 class="mb-3">Classroom: {{ classroom.name }}</h1>
+<p><strong>Section:</strong> {{ classroom.section }}</p>
 
-<h2>Students in this Classroom</h2>
+<h2 class="mt-4">Students in this Classroom</h2>
 {% if students %}
-    <ul>
+    <ul class="list-group mb-4">
         {% for student in students %}
-            <li>{{ student.name }} (Age: {{ student.age }})</li>
+            <li class="list-group-item">
+                {{ student.name }} (Age: {{ student.age }})
+            </li>
         {% endfor %}
     </ul>
 {% else %}
-    <p>No students enrolled in this classroom.</p>
+    <p class="text-muted">No students enrolled in this classroom.</p>
 {% endif %}
 
-<h2>Subjects in this Classroom</h2>
+<h2 class="mt-4">Subjects in this Classroom</h2>
 {% if subjects %}
-    <ul>
+    <ul class="list-group mb-4">
         {% for subject in subjects %}
-            <li>
+            <li class="list-group-item">
                 <a href="{% url 'school:subject_detail' subject.pk %}">{{ subject.name }}</a>
                 {% if subject.teacher %}
                     - Taught by: <a href="{% url 'school:teacher_detail' subject.teacher.pk %}">{{ subject.teacher.name }}</a>
@@ -31,10 +32,8 @@
         {% endfor %}
     </ul>
 {% else %}
-    <p>No subjects assigned to this classroom.</p>
+    <p class="text-muted">No subjects assigned to this classroom.</p>
 {% endif %}
 
-<p>
-    <a href="{% url 'school:classroom_list' %}">← Back to Classroom List</a>
-</p>
+<a href="{% url 'school:classroom_list' %}" class="btn btn-secondary mt-3">← Back to Classroom List</a>
 {% endblock %}

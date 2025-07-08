@@ -2,6 +2,9 @@ from django import forms
 from .models import Grade, Attendance, Student, Teacher, Subject, ClassRoom
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
 class GradeForm(forms.ModelForm):
     class Meta:
         model = Grade
@@ -18,14 +21,14 @@ class AttendanceForm(forms.ModelForm):
 class StudentForm(forms.ModelForm):
     class Meta:
         model = Student
-        fields = '__all__'  # If you want to exclude some fields, use 'exclude = [...]'
+        fields = '__all__'  # Use 'exclude = [...]' if you want to omit any fields
 
 class TeacherForm(forms.ModelForm):
     class Meta:
         model = Teacher
         fields = ['name', 'gender', 'subjects', 'contact']
         widgets = {
-            'subjects': forms.CheckboxSelectMultiple(),
+            'subjects': forms.CheckboxSelectMultiple(),  # Multi-select checkbox widget
         }
 
 class SubjectForm(forms.ModelForm):
@@ -40,11 +43,8 @@ class ClassRoomForm(forms.ModelForm):
         widgets = {
             'subjects': forms.CheckboxSelectMultiple(),
         }
-User = get_user_model()
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2']
-
-

@@ -1,0 +1,16 @@
+{% extends 'school/base.html' %}
+{% block title %}Submit Grade{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Submit Grade</h1>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit" class="btn btn-primary">Submit Grade</button>
+        <a href="{% url 'school:grade_list' %}" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
+</div>
+{% endblock %}

@@ -4,6 +4,8 @@ from django.contrib import messages
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.views import LoginView, LogoutView
 from django import forms
+from functools import wraps
+from django.contrib.auth.decorators import login_required
 
 from .models import Grade, ClassRoom, Subject, Teacher, Student, Attendance, User
 from .forms import (
@@ -12,12 +14,11 @@ from .forms import (
     CustomUserCreationForm
 )
 from .decorators import role_required
-from django.shortcuts import redirect
-from functools import wraps
-from django.http import HttpResponseForbidden
-from django.contrib.auth.decorators import login_required
+
+
 def no_permission(request):
     return HttpResponseForbidden("You do not have permission to access this page.")
+
 
 def role_required(allowed_roles=[]):
     def decorator(view_func):
@@ -26,13 +27,13 @@ def role_required(allowed_roles=[]):
             user = request.user
             if not user.is_authenticated:
                 return redirect('login')
-            # Ensure user has a 'role' attribute
             user_role = getattr(user, 'role', None)
             if user.is_superuser or (user_role and user_role.upper() in [r.upper() for r in allowed_roles]):
                 return view_func(request, *args, **kwargs)
-            return redirect('no_permission')  # Or render a 403 page
+            return redirect('no_permission')
         return wrapper
     return decorator
+
 
 # ---------- USER REGISTRATION ----------
 class UserRegistrationForm(CustomUserCreationForm):
@@ -49,8 +50,10 @@ class CustomLoginView(LoginView):
         auth_login(self.request, form.get_user())
         return redirect('role_redirect')
 
+
 class CustomLogoutView(LogoutView):
     next_page = 'login'
+
 
 def register(request):
     if request.method == 'POST':
@@ -75,9 +78,9 @@ def role_redirect(request):
         return redirect('school:student_dashboard')
     else:
         return redirect('school:no_permission')
+
+
 # ---------- HOME DASHBOARD ----------
-
-
 @login_required
 def home(request):
     user = request.user
@@ -91,10 +94,9 @@ def home(request):
         'students': Student.objects.all(),
         'is_admin_or_teacher': is_admin_or_teacher,
     }
-
     return render(request, 'school/home.html', context)
 
- 
+
 # ---------- CLASSROOM VIEWS ----------
 @role_required(['Admin', 'Teacher'])
 def classroom_list(request):
@@ -107,6 +109,7 @@ def classroom_list(request):
     else:
         return HttpResponseForbidden()
     return render(request, 'school/classroom_list.html', {'classrooms': classrooms})
+
 
 @role_required(['Admin', 'Teacher'])
 def classroom_detail(request, pk):
@@ -126,6 +129,7 @@ def classroom_detail(request, pk):
         'subjects': subjects,
     })
 
+
 @role_required(['Admin'])
 def classroom_create(request):
     if request.method == 'POST':
@@ -137,6 +141,7 @@ def classroom_create(request):
     else:
         form = ClassRoomForm()
     return render(request, 'school/classroom_form.html', {'form': form, 'title': 'Add Classroom'})
+
 
 @role_required(['Admin'])
 def classroom_update(request, pk):
@@ -151,6 +156,7 @@ def classroom_update(request, pk):
         form = ClassRoomForm(instance=classroom)
     return render(request, 'school/classroom_form.html', {'form': form, 'title': 'Edit Classroom'})
 
+
 @role_required(['Admin'])
 def classroom_delete(request, pk):
     classroom = get_object_or_404(ClassRoom, pk=pk)
@@ -159,6 +165,7 @@ def classroom_delete(request, pk):
         messages.success(request, f"Classroom '{classroom.name}' deleted successfully.")
         return redirect('classroom_list')
     return render(request, 'school/classroom_confirm_delete.html', {'classroom': classroom})
+
 
 # ---------- SUBJECT VIEWS ----------
 @role_required(['Admin', 'Teacher'])
@@ -175,6 +182,7 @@ def subject_list(request):
 
     return render(request, 'school/subject_list.html', {'subjects': subjects})
 
+
 @role_required(['Admin', 'Teacher'])
 def subject_detail(request, pk):
     subject = get_object_or_404(Subject, pk=pk)
@@ -187,6 +195,7 @@ def subject_detail(request, pk):
 
     return render(request, 'school/subject_detail.html', {'subject': subject})
 
+
 @role_required(['Admin'])
 def subject_create(request):
     if request.method == 'POST':
@@ -198,6 +207,7 @@ def subject_create(request):
     else:
         form = SubjectForm()
     return render(request, 'school/subject_form.html', {'form': form, 'title': 'Add Subject'})
+
 
 @role_required(['Admin'])
 def subject_update(request, pk):
@@ -212,6 +222,7 @@ def subject_update(request, pk):
         form = SubjectForm(instance=subject)
     return render(request, 'school/subject_form.html', {'form': form, 'title': 'Edit Subject'})
 
+
 @role_required(['Admin'])
 def subject_delete(request, pk):
     subject = get_object_or_404(Subject, pk=pk)
@@ -220,6 +231,7 @@ def subject_delete(request, pk):
         messages.success(request, f"Subject '{subject.name}' deleted successfully.")
         return redirect('subject_list')
     return render(request, 'school/subject_confirm_delete.html', {'subject': subject})
+
 
 # ---------- TEACHER VIEWS ----------
 @role_required(['Admin'])
@@ -235,6 +247,7 @@ def teacher_list(request):
     }
     return render(request, 'school/teacher_list.html', context)
 
+
 @role_required(['Admin', 'Teacher'])
 def teacher_detail(request, pk):
     teacher = get_object_or_404(Teacher, pk=pk)
@@ -244,6 +257,7 @@ def teacher_detail(request, pk):
         return HttpResponseForbidden()
 
     return render(request, 'school/teacher_detail.html', {'teacher': teacher})
+
 
 @role_required(['Admin'])
 def teacher_create(request):
@@ -256,6 +270,7 @@ def teacher_create(request):
     else:
         form = TeacherForm()
     return render(request, 'school/teacher_form.html', {'form': form})
+
 
 @role_required(['Admin'])
 def teacher_update(request, pk):
@@ -270,6 +285,7 @@ def teacher_update(request, pk):
         form = TeacherForm(instance=teacher)
     return render(request, 'school/teacher_form.html', {'form': form})
 
+
 @role_required(['Admin'])
 def teacher_delete(request, pk):
     teacher = get_object_or_404(Teacher, pk=pk)
@@ -278,6 +294,7 @@ def teacher_delete(request, pk):
         messages.success(request, "Teacher deleted successfully.")
         return redirect('teacher_list')
     return render(request, 'school/teacher_confirm_delete.html', {'teacher': teacher})
+
 
 # ---------- STUDENT VIEWS ----------
 @role_required(['Admin', 'Teacher', 'Student'])
@@ -303,6 +320,7 @@ def student_list(request):
     classrooms = ClassRoom.objects.all()
     return render(request, 'school/student_list.html', {'students': students, 'classrooms': classrooms})
 
+
 @role_required(['Admin', 'Teacher', 'Student'])
 def student_detail(request, pk):
     student = get_object_or_404(Student, pk=pk)
@@ -318,6 +336,7 @@ def student_detail(request, pk):
 
     return render(request, 'school/student_detail.html', {'student': student})
 
+
 @role_required(['Admin'])
 def student_create(request):
     if request.method == 'POST':
@@ -329,6 +348,7 @@ def student_create(request):
     else:
         form = StudentForm()
     return render(request, 'school/student_form.html', {'form': form, 'title': 'Add Student'})
+
 
 @role_required(['Admin'])
 def student_update(request, pk):
@@ -343,6 +363,7 @@ def student_update(request, pk):
         form = StudentForm(instance=student)
     return render(request, 'school/student_form.html', {'form': form, 'title': 'Edit Student'})
 
+
 @role_required(['Admin'])
 def student_delete(request, pk):
     student = get_object_or_404(Student, pk=pk)
@@ -351,6 +372,7 @@ def student_delete(request, pk):
         messages.success(request, f"Student '{student.name}' deleted successfully.")
         return redirect('student_list')
     return render(request, 'school/student_confirm_delete.html', {'student': student})
+
 
 # ---------- GRADES VIEWS ----------
 @role_required(['Admin', 'Teacher'])
@@ -365,6 +387,7 @@ def grade_list(request):
 
     return render(request, 'school/grade_list.html', {'grades': grades})
 
+
 @role_required(['Admin', 'Teacher'])
 def grade_create(request):
     if request.method == 'POST':
@@ -376,6 +399,7 @@ def grade_create(request):
     else:
         form = GradeForm()
     return render(request, 'school/grade_form.html', {'form': form, 'title': 'Add Grade'})
+
 
 @role_required(['Admin', 'Teacher'])
 def grade_update(request, pk):
@@ -390,6 +414,7 @@ def grade_update(request, pk):
         form = GradeForm(instance=grade)
     return render(request, 'school/grade_form.html', {'form': form, 'title': 'Edit Grade'})
 
+
 @role_required(['Admin', 'Teacher'])
 def grade_delete(request, pk):
     grade = get_object_or_404(Grade, pk=pk)
@@ -398,6 +423,7 @@ def grade_delete(request, pk):
         messages.success(request, 'Grade deleted successfully.')
         return redirect('grade_list')
     return render(request, 'school/grade_confirm_delete.html', {'grade': grade})
+
 
 # ---------- ATTENDANCE VIEWS ----------
 @role_required(['Admin', 'Teacher'])
@@ -416,6 +442,7 @@ def attendance_list(request):
 
     return render(request, 'school/attendance_list.html', {'attendances': attendances})
 
+
 @role_required(['Admin', 'Teacher'])
 def attendance_create(request):
     if request.method == 'POST':
@@ -427,6 +454,7 @@ def attendance_create(request):
     else:
         form = AttendanceForm()
     return render(request, 'school/attendance_form.html', {'form': form, 'title': 'Record Attendance'})
+
 
 @role_required(['Admin', 'Teacher'])
 def attendance_update(request, pk):
@@ -440,6 +468,7 @@ def attendance_update(request, pk):
     else:
         form = AttendanceForm(instance=attendance)
     return render(request, 'school/attendance_form.html', {'form': form, 'title': 'Edit Attendance'})
+
 
 @role_required(['Admin', 'Teacher'])
 def attendance_delete(request, pk):

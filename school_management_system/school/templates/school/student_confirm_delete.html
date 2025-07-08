@@ -1,15 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Delete Student</title>
-</head>
-<body>
+{% extends 'school/base.html' %}
+{% block title %}Delete Student{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
     <h2>Delete Student</h2>
-    <p>Are you sure you want to delete "{{ student.name }}"?</p>
-    <form method="post">
+    <p>Are you sure you want to delete <strong>{{ student.name }}</strong>?</p>
+    <form method="post" class="d-inline">
         {% csrf_token %}
-        <button type="submit">Yes, Delete</button>
-        <a href="{% url 'school:student_list' %}">Cancel</a>
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a href="{% url 'school:student_list' %}" class="btn btn-secondary ms-2">Cancel</a>
     </form>
-</body>
-</html>
+</div>
+{% endblock %}

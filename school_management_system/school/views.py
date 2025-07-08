@@ -11,8 +11,42 @@ from .forms import (
     AttendanceForm,
 )
 from .decorators import role_required
+from django.contrib.auth.views import LoginView, LogoutView
+
+from django.contrib.auth.forms import UserCreationForm
+from django.shortcuts import redirect
+from django.contrib.auth import login as auth_login
 
 
+
+def register(request):
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])
+            user.save()
+            # Save role to profile
+            role = form.cleaned_data['role']
+            user.profile.role = role
+            user.profile.save()
+            messages.success(request, 'Registration successful. Please login.')
+            return redirect('login')
+    else:
+        form = UserRegistrationForm()
+    return render(request, 'school/register.html', {'form': form})
+class CustomLoginView(LoginView):
+    template_name = 'school/login.html'
+
+    def form_valid(self, form):
+        auth_login(self.request, form.get_user())
+        role = self.request.user.profile.role
+        if role == 'student':
+            return redirect('student_dashboard')
+        elif role == 'teacher':
+            return redirect('teacher_dashboard')
+        else:
+            return redirect('home')
 # ---------- HOME ----------
 @role_required(['ADMIN', 'TEACHER', 'STUDENT'])
 def home(request):

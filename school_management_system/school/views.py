@@ -1,53 +1,84 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse
-from django.urls import reverse
+from django.http import HttpResponseForbidden
 from django.contrib import messages
-from .models import Grade
-from .forms import GradeForm
-from .models import ClassRoom, Subject, Teacher, Student
-from .forms import ClassRoomForm, SubjectForm, TeacherForm, StudentForm
-from .models import Attendance
-from .forms import AttendanceForm   
+from .models import Grade, ClassRoom, Subject, Teacher, Student, Attendance
+from .forms import (
+    GradeForm,
+    ClassRoomForm,
+    SubjectForm,
+    TeacherForm,
+    StudentForm,
+    AttendanceForm,
+)
+from .decorators import role_required
+
 
 # ---------- HOME ----------
-
+@role_required(['ADMIN', 'TEACHER', 'STUDENT'])
 def home(request):
-    total_students = Student.objects.count()
-    total_teachers = Teacher.objects.count()
-    total_subjects = Subject.objects.count()
-    total_classrooms = ClassRoom.objects.count()
-    students = Student.objects.order_by('-id')[:10]  # Show 10 recent students
+    user = request.user
+    context = {}
 
-    context = {
-        'total_students': total_students,
-        'total_teachers': total_teachers,
-        'total_subjects': total_subjects,
-        'total_classrooms': total_classrooms,
-        'students': students,
-    }
+    if user.role == 'ADMIN':
+        context = {
+            'total_students': Student.objects.count(),
+            'total_teachers': Teacher.objects.count(),
+            'total_subjects': Subject.objects.count(),
+            'total_classrooms': ClassRoom.objects.count(),
+            'students': Student.objects.order_by('-id')[:10],
+        }
+    elif user.role == 'TEACHER':
+        teacher = get_object_or_404(Teacher, name=user.get_full_name() or user.username)
+        classrooms = ClassRoom.objects.filter(subjects__teachers=teacher).distinct()
+        students = Student.objects.filter(classroom__in=classrooms)
+        context = {
+            'classrooms': classrooms,
+            'students': students,
+        }
+    else:  # STUDENT
+        student = get_object_or_404(Student, name=user.get_full_name() or user.username)
+        context = {
+            'student': student,
+        }
+
     return render(request, 'school/home.html', context)
 
 
-
-
-
-
-
 # ---------- CLASSROOM VIEWS ----------
+@role_required(['ADMIN', 'TEACHER'])
 def classroom_list(request):
-    classrooms = ClassRoom.objects.all()
+    user = request.user
+    if user.role == 'ADMIN':
+        classrooms = ClassRoom.objects.all()
+    elif user.role == 'TEACHER':
+        teacher = get_object_or_404(Teacher, name=user.get_full_name() or user.username)
+        classrooms = ClassRoom.objects.filter(subjects__teachers=teacher).distinct()
+    else:
+        return HttpResponseForbidden()
+
     return render(request, 'school/classroom_list.html', {'classrooms': classrooms})
 
+
+@role_required(['ADMIN', 'TEACHER'])
 def classroom_detail(request, pk):
     classroom = get_object_or_404(ClassRoom, pk=pk)
-    students = Student.objects.filter(classroom=classroom)
-    subjects = Subject.objects.filter(classroom=classroom)
-    return render(request, 'school/classroom_detail.html', {
-        'classroom': classroom,
-        'students': students,
-        'subjects': subjects,
-    })
 
+    user = request.user
+    if user.role == 'TEACHER':
+        teacher = get_object_or_404(Teacher, name=user.get_full_name() or user.username)
+        if not classroom.subjects.filter(teachers=teacher).exists():
+            return HttpResponseForbidden()
+
+    students = Student.objects.filter(classroom=classroom)
+    subjects = classroom.subjects.all()
+    return render(
+        request,
+        'school/classroom_detail.html',
+        {'classroom': classroom, 'students': students, 'subjects': subjects},
+    )
+
+
+@role_required(['ADMIN'])
 def classroom_create(request):
     if request.method == 'POST':
         form = ClassRoomForm(request.POST)
@@ -59,6 +90,8 @@ def classroom_create(request):
         form = ClassRoomForm()
     return render(request, 'school/classroom_form.html', {'form': form, 'title': 'Add Classroom'})
 
+
+@role_required(['ADMIN'])
 def classroom_update(request, pk):
     classroom = get_object_or_404(ClassRoom, pk=pk)
     if request.method == 'POST':
@@ -71,6 +104,8 @@ def classroom_update(request, pk):
         form = ClassRoomForm(instance=classroom)
     return render(request, 'school/classroom_form.html', {'form': form, 'title': 'Edit Classroom'})
 
+
+@role_required(['ADMIN'])
 def classroom_delete(request, pk):
     classroom = get_object_or_404(ClassRoom, pk=pk)
     if request.method == 'POST':
@@ -79,19 +114,37 @@ def classroom_delete(request, pk):
         return redirect('classroom_list')
     return render(request, 'school/classroom_confirm_delete.html', {'classroom': classroom})
 
+
 # ---------- SUBJECT VIEWS ----------
+@role_required(['ADMIN', 'TEACHER'])
 def subject_list(request):
     subjects = Subject.objects.all()
+    user = request.user
+    if user.role == 'TEACHER':
+        teacher = get_object_or_404(Teacher, name=user.get_full_name() or user.username)
+        subjects = subjects.filter(teachers=teacher)
+
     query = request.GET.get('q')
     if query:
-        subjects = subjects.filter(name__icontains=query) | subjects.filter(teacher__name__icontains=query)
+        subjects = subjects.filter(name__icontains=query) | subjects.filter(teachers__name__icontains=query)
+
     return render(request, 'school/subject_list.html', {'subjects': subjects})
 
 
+@role_required(['ADMIN', 'TEACHER'])
 def subject_detail(request, pk):
     subject = get_object_or_404(Subject, pk=pk)
+
+    user = request.user
+    if user.role == 'TEACHER':
+        teacher = get_object_or_404(Teacher, name=user.get_full_name() or user.username)
+        if not subject.teachers.filter(pk=teacher.pk).exists():
+            return HttpResponseForbidden()
+
     return render(request, 'school/subject_detail.html', {'subject': subject})
 
+
+@role_required(['ADMIN'])
 def subject_create(request):
     if request.method == 'POST':
         form = SubjectForm(request.POST)
@@ -103,6 +156,8 @@ def subject_create(request):
         form = SubjectForm()
     return render(request, 'school/subject_form.html', {'form': form, 'title': 'Add Subject'})
 
+
+@role_required(['ADMIN'])
 def subject_update(request, pk):
     subject = get_object_or_404(Subject, pk=pk)
     if request.method == 'POST':
@@ -115,6 +170,8 @@ def subject_update(request, pk):
         form = SubjectForm(instance=subject)
     return render(request, 'school/subject_form.html', {'form': form, 'title': 'Edit Subject'})
 
+
+@role_required(['ADMIN'])
 def subject_delete(request, pk):
     subject = get_object_or_404(Subject, pk=pk)
     if request.method == 'POST':
@@ -123,9 +180,9 @@ def subject_delete(request, pk):
         return redirect('subject_list')
     return render(request, 'school/subject_confirm_delete.html', {'subject': subject})
 
+
 # ---------- TEACHER VIEWS ----------
-
-
+@role_required(['ADMIN'])
 def teacher_list(request):
     query = request.GET.get('q', '')  # get search query or empty string
     if query:
@@ -138,11 +195,19 @@ def teacher_list(request):
     }
     return render(request, 'school/teacher_list.html', context)
 
+
+@role_required(['ADMIN', 'TEACHER'])
 def teacher_detail(request, pk):
     teacher = get_object_or_404(Teacher, pk=pk)
+
+    user = request.user
+    if user.role == 'TEACHER' and teacher.name != (user.get_full_name() or user.username):
+        return HttpResponseForbidden()
+
     return render(request, 'school/teacher_detail.html', {'teacher': teacher})
 
 
+@role_required(['ADMIN'])
 def teacher_create(request):
     if request.method == 'POST':
         form = TeacherForm(request.POST)
@@ -153,6 +218,8 @@ def teacher_create(request):
         form = TeacherForm()
     return render(request, 'school/teacher_form.html', {'form': form})
 
+
+@role_required(['ADMIN'])
 def teacher_update(request, pk):
     teacher = get_object_or_404(Teacher, pk=pk)
     if request.method == 'POST':
@@ -164,6 +231,8 @@ def teacher_update(request, pk):
         form = TeacherForm(instance=teacher)
     return render(request, 'school/teacher_form.html', {'form': form})
 
+
+@role_required(['ADMIN'])
 def teacher_delete(request, pk):
     teacher = get_object_or_404(Teacher, pk=pk)
     if request.method == 'POST':
@@ -173,8 +242,18 @@ def teacher_delete(request, pk):
 
 
 # ---------- STUDENT VIEWS ----------
+@role_required(['ADMIN', 'TEACHER', 'STUDENT'])
 def student_list(request):
+    user = request.user
     students = Student.objects.all()
+
+    if user.role == 'TEACHER':
+        teacher = get_object_or_404(Teacher, name=user.get_full_name() or user.username)
+        classrooms = ClassRoom.objects.filter(subjects__teachers=teacher).distinct()
+        students = students.filter(classroom__in=classrooms)
+    elif user.role == 'STUDENT':
+        students = students.filter(name=user.get_full_name() or user.username)
+
     query = request.GET.get('q')
     classroom_id = request.GET.get('classroom')
 
@@ -184,16 +263,26 @@ def student_list(request):
         students = students.filter(classroom_id=classroom_id)
 
     classrooms = ClassRoom.objects.all()
-    return render(request, 'school/student_list.html', {
-        'students': students,
-        'classrooms': classrooms
-    })
+    return render(request, 'school/student_list.html', {'students': students, 'classrooms': classrooms})
 
 
+@role_required(['ADMIN', 'TEACHER', 'STUDENT'])
 def student_detail(request, pk):
     student = get_object_or_404(Student, pk=pk)
+    user = request.user
+
+    if user.role == 'STUDENT' and student.name != (user.get_full_name() or user.username):
+        return HttpResponseForbidden()
+
+    if user.role == 'TEACHER':
+        teacher = get_object_or_404(Teacher, name=user.get_full_name() or user.username)
+        if student.classroom not in ClassRoom.objects.filter(subjects__teachers=teacher):
+            return HttpResponseForbidden()
+
     return render(request, 'school/student_detail.html', {'student': student})
 
+
+@role_required(['ADMIN'])
 def student_create(request):
     if request.method == 'POST':
         form = StudentForm(request.POST, request.FILES)
@@ -205,6 +294,8 @@ def student_create(request):
         form = StudentForm()
     return render(request, 'school/student_form.html', {'form': form, 'title': 'Add Student'})
 
+
+@role_required(['ADMIN'])
 def student_update(request, pk):
     student = get_object_or_404(Student, pk=pk)
     if request.method == 'POST':
@@ -217,6 +308,8 @@ def student_update(request, pk):
         form = StudentForm(instance=student)
     return render(request, 'school/student_form.html', {'form': form, 'title': 'Edit Student'})
 
+
+@role_required(['ADMIN'])
 def student_delete(request, pk):
     student = get_object_or_404(Student, pk=pk)
     if request.method == 'POST':
@@ -226,13 +319,21 @@ def student_delete(request, pk):
     return render(request, 'school/student_confirm_delete.html', {'student': student})
 
 
-
-
 # ---------- GRADES VIEWS ----------
+@role_required(['ADMIN', 'TEACHER'])
 def grade_list(request):
+    user = request.user
     grades = Grade.objects.select_related('student', 'subject').order_by('-id')
+
+    if user.role == 'TEACHER':
+        teacher = get_object_or_404(Teacher, name=user.get_full_name() or user.username)
+        classrooms = ClassRoom.objects.filter(subjects__teachers=teacher)
+        grades = grades.filter(student__classroom__in=classrooms)
+
     return render(request, 'school/grade_list.html', {'grades': grades})
 
+
+@role_required(['ADMIN', 'TEACHER'])
 def grade_create(request):
     if request.method == 'POST':
         form = GradeForm(request.POST)
@@ -244,6 +345,8 @@ def grade_create(request):
         form = GradeForm()
     return render(request, 'school/grade_form.html', {'form': form, 'title': 'Add Grade'})
 
+
+@role_required(['ADMIN', 'TEACHER'])
 def grade_update(request, pk):
     grade = get_object_or_404(Grade, pk=pk)
     if request.method == 'POST':
@@ -256,6 +359,8 @@ def grade_update(request, pk):
         form = GradeForm(instance=grade)
     return render(request, 'school/grade_form.html', {'form': form, 'title': 'Edit Grade'})
 
+
+@role_required(['ADMIN', 'TEACHER'])
 def grade_delete(request, pk):
     grade = get_object_or_404(Grade, pk=pk)
     if request.method == 'POST':
@@ -265,11 +370,16 @@ def grade_delete(request, pk):
     return render(request, 'school/grade_confirm_delete.html', {'grade': grade})
 
 
-
 # ---------- ATTENDANCE VIEWS ----------
-
+@role_required(['ADMIN', 'TEACHER'])
 def attendance_list(request):
     attendances = Attendance.objects.all().order_by('-date')
+    user = request.user
+
+    if user.role == 'TEACHER':
+        teacher = get_object_or_404(Teacher, name=user.get_full_name() or user.username)
+        classrooms = ClassRoom.objects.filter(subjects__teachers=teacher)
+        attendances = attendances.filter(student__classroom__in=classrooms)
 
     query = request.GET.get('q')
     if query:
@@ -277,17 +387,21 @@ def attendance_list(request):
 
     return render(request, 'school/attendance_list.html', {'attendances': attendances})
 
+
+@role_required(['ADMIN', 'TEACHER'])
 def attendance_create(request):
     if request.method == 'POST':
         form = AttendanceForm(request.POST)
         if form.is_valid():
-            attendance = form.save()
+            form.save()
             messages.success(request, "Attendance recorded successfully.")
             return redirect('attendance_list')
     else:
         form = AttendanceForm()
     return render(request, 'school/attendance_form.html', {'form': form, 'title': 'Record Attendance'})
 
+
+@role_required(['ADMIN', 'TEACHER'])
 def attendance_update(request, pk):
     attendance = get_object_or_404(Attendance, pk=pk)
     if request.method == 'POST':
@@ -301,6 +415,7 @@ def attendance_update(request, pk):
     return render(request, 'school/attendance_form.html', {'form': form, 'title': 'Edit Attendance'})
 
 
+@role_required(['ADMIN', 'TEACHER'])
 def attendance_delete(request, pk):
     attendance = get_object_or_404(Attendance, pk=pk)
     if request.method == 'POST':

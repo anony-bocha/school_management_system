@@ -10,7 +10,7 @@
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn btn-primary">💾 Save</button>
-        <a href="{% url 'classroom_list' %}" class="btn btn-secondary">← Back to Classroom List</a>
+        <a href="{% url 'school:classroom_list' %}" class="btn btn-secondary">← Back to Classroom List</a>
     </form>
 </div>
 {% endblock %}

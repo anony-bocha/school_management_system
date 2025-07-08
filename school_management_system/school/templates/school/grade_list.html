@@ -2,7 +2,7 @@
 {% block title %}Grades List{% endblock %}
 {% block content %}
 <h2>Grades</h2>
-<p><a href="{% url 'grade_create' %}" class="btn">+ Add Grade</a></p>
+<p><a href="{% url 'school:grade_create' %}" class="btn">+ Add Grade</a></p>
 <table>
     <thead>
         <tr>
@@ -21,8 +21,8 @@
             <td>{{ grade.marks }}</td>
             <td>{{ grade.grade }}</td>
             <td>
-                <a href="{% url 'grade_update' grade.pk %}" class="btn btn-sm">Edit</a>
-                <a href="{% url 'grade_delete' grade.pk %}" class="btn btn-sm">Delete</a>
+                <a href="{% url 'school:grade_update' grade.pk %}" class="btn btn-sm">Edit</a>
+                <a href="{% url 'school:grade_delete' grade.pk %}" class="btn btn-sm">Delete</a>
             </td>
         </tr>
         {% empty %}

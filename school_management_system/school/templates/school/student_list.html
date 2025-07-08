@@ -38,9 +38,9 @@
             <td>{{ student.age }}</td>
             <td>{{ student.classroom.name }} - {{ student.classroom.section }}</td>
             <td>
-                <a href="{% url 'student_detail' student.pk %}" class="btn">View</a>
-                <a href="{% url 'student_update' student.pk %}" class="btn">Edit</a>
-                <a href="{% url 'student_delete' student.pk %}" class="btn">Delete</a>
+                <a href="{% url 'school:student_detail' student.pk %}" class="btn">View</a>
+                <a href="{% url 'school:student_update' student.pk %}" class="btn">Edit</a>
+                <a href="{% url 'school:student_delete' student.pk %}" class="btn">Delete</a>
             </td>
         </tr>
         {% endfor %}
@@ -50,6 +50,6 @@
     <p>No students available.</p>
 {% endif %}
 
-<p><a href="{% url 'classroom_list' %}">← Back to Classroom List</a></p>
+<p><a href="{% url 'school:classroom_list' %}">← Back to Classroom List</a></p>
 
 {% endblock %}

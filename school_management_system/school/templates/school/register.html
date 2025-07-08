@@ -1,13 +1,13 @@
-
-
+<!-- school/templates/school/register.html -->
 {% extends 'school/base.html' %}
 {% load widget_tweaks %}
-{% block title %}Login{% endblock %}
+
+{% block title %}Register{% endblock %}
 
 {% block content %}
 <div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
     <div class="card shadow p-4" style="width: 100%; max-width: 400px;">
-        <h3 class="text-center mb-4">Login</h3>
+        <h3 class="text-center mb-4">Register</h3>
         <form method="post" novalidate>
             {% csrf_token %}
             {% for field in form %}
@@ -19,10 +19,10 @@
                     {% endif %}
                 </div>
             {% endfor %}
-            <button type="submit" class="btn btn-primary w-100">Login</button>
+            <button type="submit" class="btn btn-success w-100">Register</button>
         </form>
         <p class="text-center mt-3">
-            Don't have an account? <a href="{% url 'register' %}">Register</a>
+            Already have an account? <a href="{% url 'login' %}">Login</a>
         </p>
     </div>
 </div>

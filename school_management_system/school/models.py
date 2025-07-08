@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
-
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 
 class User(AbstractUser):
     ROLE_CHOICES = (
@@ -22,6 +22,9 @@ class ClassRoom(models.Model):
     def __str__(self):
         return f"{self.name} - {self.section}"
 
+    class Meta:
+        ordering = ['name', 'section']
+        verbose_name_plural = 'Classrooms'
 
 class Subject(models.Model):
     name = models.CharField(max_length=100)
@@ -30,6 +33,8 @@ class Subject(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ['name']
 
 class Teacher(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -43,12 +48,13 @@ class Teacher(models.Model):
     def __str__(self):
         return self.name
 
-
+    class Meta:
+        ordering = ['name']
 
 class Student(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     GENDER_CHOICES = [('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')]
-    
+
     name = models.CharField(max_length=100)
     age = models.PositiveIntegerField()
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
@@ -59,6 +65,10 @@ class Student(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ['name']
+
 class Attendance(models.Model):
     STATUS_CHOICES = [('Present', 'Present'), ('Absent', 'Absent')]
 
@@ -72,7 +82,9 @@ class Attendance(models.Model):
     def __str__(self):
         return f"{self.student.name} - {self.date} - {self.status}"
 
-
+    def clean(self):
+        if Attendance.objects.filter(student=self.student, date=self.date).exclude(pk=self.pk).exists():
+            raise ValidationError('Attendance for this student on this date already exists.')
 
 class Grade(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='grades')
@@ -85,6 +97,10 @@ class Grade(models.Model):
 
     def __str__(self):
         return f"{self.student.name} - {self.subject.name} - {self.grade}"
+
+    def clean(self):
+        if Grade.objects.filter(student=self.student, subject=self.subject).exclude(pk=self.pk).exists():
+            raise ValidationError('Grade for this student and subject already exists.')
 
 class Timetable(models.Model):
     DAYS_OF_WEEK = [
@@ -105,7 +121,7 @@ class Timetable(models.Model):
         unique_together = ('classroom', 'day_of_week', 'period_time')
 
     def __str__(self):
-        return f"{self.classroom} - {self.subject} - {self.day_of_week} - {self.period_time}"
+        return f"{self.classroom.name} ({self.classroom.section}) - {self.subject.name} - {self.day_of_week} at {self.period_time.strftime('%H:%M')}"
 
 class Fee(models.Model):
     STATUS_CHOICES = [('Paid', 'Paid'), ('Unpaid', 'Unpaid')]
@@ -126,3 +142,6 @@ class Notice(models.Model):
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        ordering = ['-date_posted']

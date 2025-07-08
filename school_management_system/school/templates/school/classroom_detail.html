@@ -23,9 +23,9 @@
     <ul>
         {% for subject in subjects %}
             <li>
-                <a href="{% url 'subject_detail' subject.pk %}">{{ subject.name }}</a>
+                <a href="{% url 'school:subject_detail' subject.pk %}">{{ subject.name }}</a>
                 {% if subject.teacher %}
-                    - Taught by: <a href="{% url 'teacher_detail' subject.teacher.pk %}">{{ subject.teacher.name }}</a>
+                    - Taught by: <a href="{% url 'school:teacher_detail' subject.teacher.pk %}">{{ subject.teacher.name }}</a>
                 {% endif %}
             </li>
         {% endfor %}
@@ -35,6 +35,6 @@
 {% endif %}
 
 <p>
-    <a href="{% url 'classroom_list' %}">← Back to Classroom List</a>
+    <a href="{% url 'school:classroom_list' %}">← Back to Classroom List</a>
 </p>
 {% endblock %}

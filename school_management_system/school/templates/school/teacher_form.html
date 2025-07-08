@@ -4,10 +4,20 @@
 
 {% block content %}
     <h2>{{ title }}</h2>
-    <form method="post" class="mb-3">
+    <form method="post">
         {% csrf_token %}
+        <label>Username:</label>
+        <input type="text" name="username" required class="form-control mb-2">
+    
+        <label>Email:</label>
+        <input type="email" name="email" required class="form-control mb-2">
+    
+        <label>Password:</label>
+        <input type="password" name="password" required class="form-control mb-2">
+    
         {{ form.as_p }}
         <button type="submit" class="btn btn-primary">Save</button>
     </form>
-    <p><a href="{% url 'teacher_list' %}" class="btn btn-secondary">← Back to Teacher List</a></p>
+    
+    <p><a href="{% url 'school:teacher_list' %}" class="btn btn-secondary">← Back to Teacher List</a></p>
 {% endblock %}

@@ -203,7 +203,7 @@ def subject_create(request):
         if form.is_valid():
             subject = form.save()
             messages.success(request, f"Subject '{subject.name}' created successfully.")
-            return redirect('subject_list')
+            return redirect('school:subject_list')
     else:
         form = SubjectForm()
     return render(request, 'school/subject_form.html', {'form': form, 'title': 'Add Subject'})
@@ -263,14 +263,30 @@ def teacher_detail(request, pk):
 def teacher_create(request):
     if request.method == 'POST':
         form = TeacherForm(request.POST)
-        if form.is_valid():
-            form.save()
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        if form.is_valid() and username and email and password:
+            # Create user first
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                role='TEACHER'
+            )
+
+            teacher = form.save(commit=False)
+            teacher.user = user
+            teacher.save()
+            form.save_m2m()
+
             messages.success(request, "Teacher created successfully.")
-            return redirect('teacher_list')
+            return redirect('school:teacher_list')
     else:
         form = TeacherForm()
-    return render(request, 'school/teacher_form.html', {'form': form})
 
+    return render(request, 'school/teacher_form.html', {'form': form, 'title': 'Add Teacher'})
 
 @role_required(['Admin'])
 def teacher_update(request, pk):
@@ -280,7 +296,7 @@ def teacher_update(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, "Teacher updated successfully.")
-            return redirect('teacher_detail', pk=pk)
+            return redirect('school:teacher_detail', pk=pk)
     else:
         form = TeacherForm(instance=teacher)
     return render(request, 'school/teacher_form.html', {'form': form})
@@ -450,7 +466,7 @@ def attendance_create(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Attendance recorded successfully.")
-            return redirect('attendance_list')
+            return redirect('school:attendance_list')
     else:
         form = AttendanceForm()
     return render(request, 'school/attendance_form.html', {'form': form, 'title': 'Record Attendance'})
@@ -464,7 +480,7 @@ def attendance_update(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, "Attendance updated successfully.")
-            return redirect('attendance_list')
+            return redirect('school:attendance_list')
     else:
         form = AttendanceForm(instance=attendance)
     return render(request, 'school/attendance_form.html', {'form': form, 'title': 'Edit Attendance'})
@@ -476,5 +492,5 @@ def attendance_delete(request, pk):
     if request.method == 'POST':
         attendance.delete()
         messages.success(request, "Attendance deleted successfully.")
-        return redirect('attendance_list')
+        return redirect('school:attendance_list')
     return render(request, 'school/attendance_confirm_delete.html', {'attendance': attendance})

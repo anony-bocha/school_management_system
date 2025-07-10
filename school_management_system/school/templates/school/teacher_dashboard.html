@@ -1,0 +1,13 @@
+{% extends 'school/base.html' %}
+{% block title %}Teacher Dashboard{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Welcome, {{ user.username }} (Teacher)</h2>
+
+    <div class="alert alert-info">
+        You can view your classrooms, subjects, and students assigned to you.
+    </div>
+
+    <p>Use the sidebar to manage your classes and view your schedules.</p>
+</div>
+{% endblock %}

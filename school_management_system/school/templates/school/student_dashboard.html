@@ -1,0 +1,13 @@
+{% extends 'school/base.html' %}
+{% block title %}Student Dashboard{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Welcome, {{ user.username }} (Student)</h2>
+
+    <div class="alert alert-success">
+        You can view your subjects, grades, and attendance records here.
+    </div>
+
+    <p>Use the sidebar to explore your learning materials and updates.</p>
+</div>
+{% endblock %}

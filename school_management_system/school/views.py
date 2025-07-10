@@ -1,3 +1,5 @@
+# Clean, fixed, fully working views.py for your school management system
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseForbidden
 from django.contrib import messages
@@ -13,12 +15,9 @@ from .forms import (
     TeacherForm, StudentForm, AttendanceForm,
     CustomUserCreationForm
 )
-from .decorators import role_required
-
 
 def no_permission(request):
-    return HttpResponseForbidden("You do not have permission to access this page.")
-
+    return render(request, 'school/no_permission.html', status=403)
 
 def role_required(allowed_roles=[]):
     def decorator(view_func):
@@ -30,19 +29,15 @@ def role_required(allowed_roles=[]):
             user_role = getattr(user, 'role', None)
             if user.is_superuser or (user_role and user_role.upper() in [r.upper() for r in allowed_roles]):
                 return view_func(request, *args, **kwargs)
-            return redirect('no_permission')
+            return redirect('school:no_permission')
         return wrapper
     return decorator
 
-
-# ---------- USER REGISTRATION ----------
 class UserRegistrationForm(CustomUserCreationForm):
     class Meta(CustomUserCreationForm.Meta):
         model = User
         fields = CustomUserCreationForm.Meta.fields + ["email"]
 
-
-# ---------- AUTH VIEWS ----------
 class CustomLoginView(LoginView):
     template_name = 'registration/login.html'
 
@@ -50,10 +45,8 @@ class CustomLoginView(LoginView):
         auth_login(self.request, form.get_user())
         return redirect('role_redirect')
 
-
 class CustomLogoutView(LogoutView):
     next_page = 'login'
-
 
 def register(request):
     if request.method == 'POST':
@@ -65,7 +58,6 @@ def register(request):
     else:
         form = CustomUserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
-
 
 @login_required
 def role_redirect(request):
@@ -79,13 +71,22 @@ def role_redirect(request):
     else:
         return redirect('school:no_permission')
 
+@login_required
+def admin_dashboard(request):
+    return render(request, 'school/admin_dashboard.html')
 
-# ---------- HOME DASHBOARD ----------
+@login_required
+def teacher_dashboard(request):
+    return render(request, 'school/teacher_dashboard.html')
+
+@login_required
+def student_dashboard(request):
+    return render(request, 'school/student_dashboard.html')
+
 @login_required
 def home(request):
     user = request.user
     is_admin_or_teacher = user.is_superuser or user.groups.filter(name__in=['Admin', 'Teacher']).exists()
-
     context = {
         'total_students': Student.objects.count(),
         'total_teachers': Teacher.objects.count(),

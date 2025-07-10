@@ -48,7 +48,7 @@ urlpatterns = [
     path('attendances/create/', views.attendance_create, name='attendance_create'),
     path('attendances/<int:pk>/update/', views.attendance_update, name='attendance_update'),
     path('attendances/<int:pk>/delete/', views.attendance_delete, name='attendance_delete'),
-
+    path('no-permission/', views.no_permission, name='no_permission'),
     # Grades
     path('grades/', views.grade_list, name='grade_list'),
     path('grades/create/', views.grade_create, name='grade_create'),

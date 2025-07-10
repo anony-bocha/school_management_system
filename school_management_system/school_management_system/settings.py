@@ -142,6 +142,25 @@ LOGOUT_REDIRECT_URL = 'school:login'
 LOGIN_URL = 'school:login'
 
 
-# Optional: Email backend for development (prints emails to console)
+# =======================
+# Email Configuration
+# =======================
+
+# For local development: prints emails to console instead of sending
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Default "from" email shown in the received email
+DEFAULT_FROM_EMAIL = 'noreply@school-system.local'
+
+# For production SMTP (when ready), replace with:
+"""
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'               # or your provider
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'your_email@gmail.com'
+EMAIL_HOST_PASSWORD = 'your_app_specific_password'
+DEFAULT_FROM_EMAIL = 'your_email@gmail.com'
+"""
+
 

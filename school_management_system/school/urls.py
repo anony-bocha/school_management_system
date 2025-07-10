@@ -6,7 +6,9 @@ app_name = 'school'  # Optional but recommended for namespacing
 
 urlpatterns = [
     path('', views.home, name='home'),
-
+    path('users/create/', views.user_create_by_admin, name='user_create_by_admin'),
+    path('users/force-password-change/', views.force_password_change, name='force_password_change'),
+    path('users/', views.user_list, name='user_list'),
     # Classrooms
     path('classrooms/', views.classroom_list, name='classroom_list'),
     path('classrooms/<int:pk>/', views.classroom_detail, name='classroom_detail'),
@@ -42,7 +44,7 @@ urlpatterns = [
     path('students/create/', views.student_create, name='student_create'),
     path('students/<int:pk>/update/', views.student_update, name='student_update'),
     path('students/<int:pk>/delete/', views.student_delete, name='student_delete'),
-
+    path('users/create/', views.user_create_by_admin, name='user_create_by_admin'),
     # Attendances
     path('attendances/', views.attendance_list, name='attendance_list'),
     path('attendances/create/', views.attendance_create, name='attendance_create'),

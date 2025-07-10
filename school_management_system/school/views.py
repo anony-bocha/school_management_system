@@ -8,14 +8,32 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django import forms
 from functools import wraps
 from django.contrib.auth.decorators import login_required
-
+from django.core.mail import send_mail
+from django.conf import settings
+from django.utils.crypto import get_random_string
 from .models import Grade, ClassRoom, Subject, Teacher, Student, Attendance, User
 from .forms import (
     GradeForm, ClassRoomForm, SubjectForm,
     TeacherForm, StudentForm, AttendanceForm,
     CustomUserCreationForm
 )
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 
+@login_required
+def force_password_change(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            user = form.save()
+            user.force_password_change = False
+            user.save()
+            update_session_auth_hash(request, user)
+            messages.success(request, "Password changed successfully.")
+            return redirect('role_redirect')
+    else:
+        form = PasswordChangeForm(user=request.user)
+    return render(request, 'school/force_password_change.html', {'form': form, 'title': 'Change Your Password'})
 def no_permission(request):
     return render(request, 'school/no_permission.html', status=403)
 
@@ -335,7 +353,13 @@ def student_list(request):
         students = students.filter(classroom_id=classroom_id)
 
     classrooms = ClassRoom.objects.all()
-    return render(request, 'school/student_list.html', {'students': students, 'classrooms': classrooms})
+
+    # ✅ FIX: use correct template path
+    return render(request, 'school/student_list.html', {
+        'students': students,
+        'classrooms': classrooms
+    })
+
 
 
 @role_required(['Admin', 'Teacher', 'Student'])
@@ -361,10 +385,11 @@ def student_create(request):
         if form.is_valid():
             student = form.save()
             messages.success(request, f"Student '{student.name}' created successfully.")
-            return redirect('student_list')
+            return redirect('school:student_list')  
     else:
         form = StudentForm()
-    return render(request, 'school/student_form.html', {'form': form, 'title': 'Add Student'})
+    return render(request, 'school/student_form.html', {'form': form, 'title': 'Add Student'})  
+
 
 
 @role_required(['Admin'])
@@ -375,7 +400,7 @@ def student_update(request, pk):
         if form.is_valid():
             student = form.save()
             messages.success(request, f"Student '{student.name}' updated successfully.")
-            return redirect('student_detail', pk=student.pk)
+            return redirect('school:student_detail', pk=student.pk)
     else:
         form = StudentForm(instance=student)
     return render(request, 'school/student_form.html', {'form': form, 'title': 'Edit Student'})
@@ -387,7 +412,7 @@ def student_delete(request, pk):
     if request.method == 'POST':
         student.delete()
         messages.success(request, f"Student '{student.name}' deleted successfully.")
-        return redirect('student_list')
+        return redirect('school:student_list')
     return render(request, 'school/student_confirm_delete.html', {'student': student})
 
 
@@ -412,10 +437,11 @@ def grade_create(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Grade added successfully.')
-            return redirect('grade_list')
+            return redirect('school:grade_list')  
     else:
         form = GradeForm()
     return render(request, 'school/grade_form.html', {'form': form, 'title': 'Add Grade'})
+
 
 
 @role_required(['Admin', 'Teacher'])
@@ -426,7 +452,7 @@ def grade_update(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, 'Grade updated successfully.')
-            return redirect('grade_list')
+            return redirect('school:grade_list')
     else:
         form = GradeForm(instance=grade)
     return render(request, 'school/grade_form.html', {'form': form, 'title': 'Edit Grade'})
@@ -438,7 +464,7 @@ def grade_delete(request, pk):
     if request.method == 'POST':
         grade.delete()
         messages.success(request, 'Grade deleted successfully.')
-        return redirect('grade_list')
+        return redirect('school:grade_list')
     return render(request, 'school/grade_confirm_delete.html', {'grade': grade})
 
 
@@ -506,3 +532,49 @@ def teacher_dashboard(request):
 @login_required
 def student_dashboard(request):
     return render(request, 'school/student_dashboard.html')
+@role_required(['Admin'])
+def user_list(request):
+    users = User.objects.all()
+    return render(request, 'school/user_list.html', {'users': users})
+@role_required(['Admin'])
+def user_create_by_admin(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            password = form.cleaned_data.get('password1')
+            user.set_password(password)
+            user.save()
+            messages.success(request, f"User '{user.username}' created successfully with initial password.")
+            return redirect('school:user_list')  # ensure you have user_list or adjust to your dashboard
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'school/user_form.html', {'form': form, 'title': 'Create User'})
+
+
+@role_required(['Admin'])
+def user_create_by_admin(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            temp_password = get_random_string(length=8)
+            user.set_password(temp_password)
+            user.force_password_change = True
+            user.save()
+            
+            # Send email with credentials
+            send_mail(
+                subject='Your Account Credentials',
+                message=f"Hello {user.username},\n\nYour account has been created.\nUsername: {user.username}\nTemporary Password: {temp_password}\nPlease log in and change your password immediately.",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
+            
+            messages.success(request, f"User '{user.username}' created and email sent successfully.")
+            return redirect('school:user_list')
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'school/user_form.html', {'form': form, 'title': 'Create User'})
+

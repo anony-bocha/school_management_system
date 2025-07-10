@@ -9,10 +9,8 @@ class User(AbstractUser):
         ('TEACHER', 'Teacher'),
         ('STUDENT', 'Student'),
     )
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='STUDENT')
-
-    def __str__(self):
-        return f"{self.username} ({self.role})"
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, null=True, blank=True)
+    force_password_change = models.BooleanField(default=False)  # Add this field
 
 class ClassRoom(models.Model):
     name = models.CharField(max_length=100)

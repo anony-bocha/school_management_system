@@ -2,6 +2,12 @@ from django import forms
 from .models import Grade, Attendance, Student, Teacher, Subject, ClassRoom
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
+from .models import User
+
+class CustomUserCreationForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'role')
 
 User = get_user_model()
 

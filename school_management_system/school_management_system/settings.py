@@ -49,8 +49,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'school.middleware.ForcePasswordChangeMiddleware',
 ]
-
 ROOT_URLCONF = 'school_management_system.urls'
 
 TEMPLATES = [

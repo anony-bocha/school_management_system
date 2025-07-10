@@ -44,7 +44,7 @@ class UserRegistrationForm(CustomUserCreationForm):
 
 # ---------- AUTH VIEWS ----------
 class CustomLoginView(LoginView):
-    template_name = 'school/login.html'
+    template_name = 'registration/login.html'
 
     def form_valid(self, form):
         auth_login(self.request, form.get_user())
@@ -64,7 +64,7 @@ def register(request):
             return redirect('login')
     else:
         form = CustomUserCreationForm()
-    return render(request, 'school/register.html', {'form': form})
+    return render(request, 'registration/register.html', {'form': form})
 
 
 @login_required
@@ -494,3 +494,14 @@ def attendance_delete(request, pk):
         messages.success(request, "Attendance deleted successfully.")
         return redirect('school:attendance_list')
     return render(request, 'school/attendance_confirm_delete.html', {'attendance': attendance})
+@login_required
+def admin_dashboard(request):
+    return render(request, 'school/admin_dashboard.html')
+
+@login_required
+def teacher_dashboard(request):
+    return render(request, 'school/teacher_dashboard.html')
+
+@login_required
+def student_dashboard(request):
+    return render(request, 'school/student_dashboard.html')

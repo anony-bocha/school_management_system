@@ -54,7 +54,9 @@ urlpatterns = [
     path('grades/create/', views.grade_create, name='grade_create'),
     path('grades/<int:pk>/update/', views.grade_update, name='grade_update'),
     path('grades/<int:pk>/delete/', views.grade_delete, name='grade_delete'),
-
+    path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('teacher-dashboard/', views.teacher_dashboard, name='teacher_dashboard'),
+    path('student-dashboard/', views.student_dashboard, name='student_dashboard'),
     # No permission page
     path('no-permission/', views.no_permission, name='no_permission'),
 ]

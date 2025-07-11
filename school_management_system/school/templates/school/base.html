@@ -54,10 +54,9 @@
             border: none;
             background: none;
         }
-        nav a:hover, nav a:focus, nav form button:hover, nav form button:focus {
+        nav a:hover, nav form button:hover {
             background-color: rgba(255, 255, 255, 0.25);
             color: #e0e0e0;
-            outline: none;
         }
         nav a.active {
             background-color: #003366;
@@ -81,7 +80,6 @@
                 background: #004d99;
                 padding: 10px 0;
                 border-radius: 0 0 8px 8px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
                 position: absolute;
                 top: 64px;
                 left: 0;
@@ -101,20 +99,7 @@
             font-size: 14px;
         }
         .messages {
-            margin-bottom: 20px;
-            padding: 15px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-        }
-        .messages .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .messages .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            margin: 15px 0;
         }
     </style>
 
@@ -146,17 +131,20 @@
         </nav>
     </header>
 
-    {% if messages %}
-    <div class="messages" role="alert">
-        {% for message in messages %}
-            <div class="{{ message.tags }}">{{ message }}</div>
-        {% endfor %}
-    </div>
-    {% endif %}
+    <div class="container py-4">
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
-    <main>
         {% block content %}{% endblock %}
-    </main>
+    </div>
 
     <footer>
         &copy; {% now "Y" %} School Management System. All rights reserved.
@@ -171,5 +159,8 @@
             nav.classList.toggle('show');
         });
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_scripts %}{% endblock %}
 </body>
 </html>

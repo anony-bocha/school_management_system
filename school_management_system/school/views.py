@@ -1,18 +1,18 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
 from django.contrib import messages
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.views import LoginView, LogoutView
 from django import forms
 from functools import wraps
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils.crypto import get_random_string
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
-from django.db import IntegrityError # For handling unique constraint errors, e.g., on username
-from django.db.models import Q # For complex queries like OR conditions
+from django.db import IntegrityError  # For handling unique constraint errors, e.g., on username
+from django.db.models import Q  # For complex queries like OR conditions
 
 from .models import Grade, ClassRoom, Subject, Teacher, Student, Attendance, User
 from .forms import (
@@ -146,10 +146,33 @@ def role_redirect(request):
 
 #--------------------------------------------------------------------------------------------------------------------------
 # --- Dashboard Views ---
-@role_required(['ADMIN']) # Changed to uppercase as per convention in role_required
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='ADMIN').exists(), login_url='school:no_permission')
 def admin_dashboard(request):
-    """Renders the admin dashboard."""
-    return render(request, 'school/admin_dashboard.html')
+    context = {
+        'teachers_count': Teacher.objects.count(),
+        'students_count': Student.objects.count(),
+        'classes_count': Classroom.objects.count(),
+        'subjects_count': Subject.objects.count(),
+        'users_count': User.objects.count(),
+        'recent_users': User.objects.order_by('-date_joined')[:5],
+    }
+    return render(request, 'school/admin_dashboard.html', context)
+
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='ADMIN').exists(), login_url='school:no_permission')
+def admin_dashboard_data(request):
+    data = {
+        'teachers_count': Teacher.objects.count(),
+        'students_count': Student.objects.count(),
+        'classes_count': Classroom.objects.count(),
+        'subjects_count': Subject.objects.count(),
+        'users_count': User.objects.count(),
+        'recent_users': list(User.objects.order_by('-date_joined').values(
+            'username', 'email', 'date_joined', 'last_login'
+        )[:5])
+    }
+    return JsonResponse(data)
 #--------------------------------------------------------------------------------------------------------------------------
 @role_required(['TEACHER']) # Changed to uppercase
 def teacher_dashboard(request):

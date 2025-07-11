@@ -22,7 +22,9 @@ urlpatterns = [
     path('users/create/', views.user_create_by_admin, name='user_create_by_admin'), # Keep one instance
 
     # --- Dashboards ---
+   
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('admin-dashboard/data/', views.admin_dashboard_data, name='admin_dashboard_data'),
     path('teacher-dashboard/', views.teacher_dashboard, name='teacher_dashboard'),
     path('student-dashboard/', views.student_dashboard, name='student_dashboard'),
 

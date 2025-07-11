@@ -11,11 +11,11 @@
 
     <h3>Classroom</h3>
     <p>
-        <a href="{% url 'school:classroom_detail' subject.classroom.pk %}" class="text-decoration-none">
+        <a href="{% url 'school:classroom_detail' subject.pk %}" class="text-decoration-none">
             {{ subject.classroom.name }} {{ subject.classroom.section }}
         </a>
     </p>
-
+  <!-- .classroom-->
     <h3>Teachers</h3>
     {% if subject.teachers.all %}
         <ul>

@@ -37,7 +37,7 @@
             {% for subject in subjects %}
             <tr>
                 <td>{{ subject.name }}</td>
-                <td>{{ subject.classroom.name }} - {{ subject.classroom.section }}</td>
+                <td>{{ student.classroom.name }} - {{ student.classroom.section }}</td>
                 <td>{{ subject.teacher.name }}</td>
                 <td>
                     <a href="{% url 'school:subject_detail' subject.pk %}" class="btn btn-sm btn-info me-1">View</a>

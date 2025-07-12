@@ -1,33 +1,87 @@
 {% extends 'school/base.html' %}
-{% block title %}Users{% endblock %}
+{% block title %}User Management | SchoolMS{% endblock %}
 {% block content %}
-<h2>Users</h2>
-<a href="{% url 'school:user_create_by_admin' %}" class="btn btn-primary mb-3">+ Create New User</a>
 
-<table class="table table-striped">
+<h2>User Management</h2>
+
+<form method="get" class="mb-3 d-flex flex-wrap gap-2">
+    <input type="text" name="q" placeholder="Search by username" value="{{ search_query }}" class="form-control w-auto">
+    <select name="role" class="form-select w-auto">
+        <option value="">All Roles</option>
+        <option value="ADMIN" {% if role_filter == 'ADMIN' %}selected{% endif %}>Admin</option>
+        <option value="TEACHER" {% if role_filter == 'TEACHER' %}selected{% endif %}>Teacher</option>
+        <option value="STUDENT" {% if role_filter == 'STUDENT' %}selected{% endif %}>Student</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Filter</button>
+    <a href="{% url 'school:user_create_by_admin' %}" class="btn btn-success ms-auto">+ Create User</a>
+</form>
+
+<table class="table table-striped table-hover">
     <thead>
         <tr>
             <th>Username</th>
             <th>Role</th>
             <th>Email</th>
+            <th>Status</th>
+            <th>Joined</th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-        {% for user in users %}
-            <tr>
-                <td>{{ user.username }}</td>
-                <td>{{ user.role }}</td>
-                <td>{{ user.email }}</td>
-                <td>
-                    <a href="{% url 'school:user_edit' user.pk %}" class="btn btn-sm btn-warning">Edit</a>
-                    <a href="{% url 'school:user_delete' user.pk %}" class="btn btn-sm btn-danger" 
-                       onclick="return confirm('Are you sure you want to delete this user?');">Delete</a>
-                </td>
-            </tr>
+        {% for user in page_obj %}
+        <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.role }}</td>
+            <td>{{ user.email|default:"-" }}</td>
+            <td>
+                {% if user.is_active %}
+                    <span class="badge bg-success">Active</span>
+                {% else %}
+                    <span class="badge bg-secondary">Inactive</span>
+                {% endif %}
+            </td>
+            <td>{{ user.date_joined|date:"Y-m-d" }}</td>
+            <td>
+                <a href="{% url 'school:user_edit' user.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                <a href="{% url 'school:user_delete' user.pk %}" class="btn btn-sm btn-danger"
+                   onclick="return confirm('Are you sure you want to delete {{ user.username }}?');">Delete</a>
+            </td>
+        </tr>
         {% empty %}
-            <tr><td colspan="4" class="text-center">No users found.</td></tr>
+        <tr>
+            <td colspan="6" class="text-center">No users found.</td>
+        </tr>
         {% endfor %}
     </tbody>
 </table>
+
+<!-- Pagination -->
+<nav>
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ search_query }}&role={{ role_filter }}">Previous</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">Previous</span>
+        </li>
+        {% endif %}
+
+        <li class="page-item disabled">
+            <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        </li>
+
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ search_query }}&role={{ role_filter }}">Next</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">Next</span>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+
 {% endblock %}

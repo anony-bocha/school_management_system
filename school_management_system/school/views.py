@@ -21,7 +21,7 @@ from .forms import (
     CustomUserCreationForm
 )
 from .forms import CustomUserCreationForm, CustomUserChangeForm
-
+from django.core.paginator import Paginator
 # --- Utility Functions and Decorators ---
 @login_required
 def force_password_change(request):
@@ -730,9 +730,26 @@ def attendance_delete(request, pk):
 # --- User Management (Admin Only) ---
 @role_required(['ADMIN'])
 def user_list(request):
-    """Lists all users (Admin only)."""
+    search_query = request.GET.get('q', '')
+    role_filter = request.GET.get('role', '')
+
     users = User.objects.all()
-    return render(request, 'school/user_list.html', {'users': users})
+
+    if search_query:
+        users = users.filter(username__icontains=search_query)
+    if role_filter:
+        users = users.filter(role__iexact=role_filter)
+
+    paginator = Paginator(users.order_by('-date_joined'), 10)  # 10 per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'role_filter': role_filter,
+    }
+    return render(request, 'school/user_list.html', context)
 @role_required(['ADMIN'])
 def user_edit(request, pk):
     user = get_object_or_404(User, pk=pk)

@@ -17,7 +17,7 @@
             <tr>
                 <th>Name</th>
                 <th>Section</th>
-                <th>Actions</th>
+                <th class="text-center">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -29,12 +29,12 @@
                     </a>
                 </td>
                 <td>{{ classroom.section }}</td>
-                <td>
-                    <a href="{% url 'school:classroom_update' classroom.pk %}" class="btn btn-sm btn-warning me-1">
+                <td class="text-center">
+                    <a href="{% url 'school:classroom_update' classroom.pk %}" class="btn btn-sm btn-warning me-1" title="Edit Classroom">
                         Edit
                     </a>
                     <a href="{% url 'school:classroom_delete' classroom.pk %}" class="btn btn-sm btn-danger"
-                       onclick="return confirm('Are you sure you want to delete this classroom?');">
+                       onclick="return confirm('Are you sure you want to delete this classroom?');" title="Delete Classroom">
                         Delete
                     </a>
                 </td>

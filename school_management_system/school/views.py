@@ -22,7 +22,7 @@ from .forms import (
 )
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.core.paginator import Paginator
-# --- Utility Functions and Decorators ---
+from django.db.models import Prefetch
 @login_required
 def force_password_change(request):
     """
@@ -292,17 +292,24 @@ def classroom_delete(request, pk):
 # ---------- SUBJECT VIEWS ----------
 @role_required(['ADMIN', 'TEACHER'])
 def subject_list(request):
-    """Lists all subjects, filtered for teachers to show only relevant ones. Supports search."""
     user = request.user
     subjects = Subject.objects.all()
+
     if hasattr(user, 'role') and user.role.upper() == 'TEACHER':
         teacher = get_object_or_404(Teacher, user=user)
         subjects = subjects.filter(teachers=teacher)
 
     query = request.GET.get('q')
     if query:
-        # Use Q objects for more complex OR queries
-        subjects = subjects.filter(Q(name__icontains=query) | Q(teachers__name__icontains=query)).distinct()
+        subjects = subjects.filter(
+            Q(name__icontains=query) | Q(teachers__name__icontains=query)
+        ).distinct()
+
+    # Prefetch related classrooms and teachers for efficient DB access
+    subjects = subjects.prefetch_related(
+        'teachers',
+        Prefetch('classrooms', queryset=ClassRoom.objects.all())
+    )
 
     return render(request, 'school/subject_list.html', {'subjects': subjects})
 
@@ -504,35 +511,23 @@ def teacher_delete(request, pk):
 # ---------- STUDENT VIEWS ----------
 @role_required(['ADMIN', 'TEACHER', 'STUDENT'])
 def student_list(request):
-    """
-    Lists all students, filtered by teacher's classrooms or for the individual student.
-    Supports searching and filtering by classroom.
-    """
-    user = request.user
     students = Student.objects.all()
+    classrooms = ClassRoom.objects.all()
 
-    if hasattr(user, 'role') and user.role.upper() == 'TEACHER':
-        teacher = get_object_or_404(Teacher, user=user)
-        classrooms = ClassRoom.objects.filter(subjects__teachers=teacher).distinct()
-        students = students.filter(classroom__in=classrooms)
-    elif hasattr(user, 'role') and user.role.upper() == 'STUDENT':
-        students = students.filter(user=user) # Student can only see their own profile
+    # Filter by search query
+    q = request.GET.get('q')
+    if q:
+        students = students.filter(name__icontains=q)
 
-    query = request.GET.get('q')
+    # Filter by classroom
     classroom_id = request.GET.get('classroom')
-
-    if query:
-        students = students.filter(name__icontains=query)
     if classroom_id:
         students = students.filter(classroom_id=classroom_id)
 
-    classrooms = ClassRoom.objects.all() # All classrooms for filtering dropdown
-
     return render(request, 'school/student_list.html', {
         'students': students,
-        'classrooms': classrooms
+        'classrooms': classrooms,
     })
-
 #--------------------------------------------------------------------------------------------------------------------------
 @role_required(['ADMIN', 'TEACHER', 'STUDENT'])
 def student_detail(request, pk):
@@ -595,10 +590,9 @@ def student_update(request, pk):
 #--------------------------------------------------------------------------------------------------------------------------
 @role_required(['ADMIN'])
 def student_delete(request, pk):
-    """Handles deletion of a student."""
     student = get_object_or_404(Student, pk=pk)
     if request.method == 'POST':
-        student_name = student.name # Get name before deletion
+        student_name = student.name
         student.delete()
         messages.success(request, f"Student '{student_name}' deleted successfully.")
         return redirect('school:student_list')

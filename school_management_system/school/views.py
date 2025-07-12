@@ -13,14 +13,14 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.db import IntegrityError  # For handling unique constraint errors, e.g., on username
 from django.db.models import Q  # For complex queries like OR conditions
-
+from django.shortcuts import redirect
 from .models import Grade, ClassRoom, Subject, Teacher, Student, Attendance, User
 from .forms import (
     GradeForm, ClassRoomForm, SubjectForm,
     TeacherForm, StudentForm, AttendanceForm,
     CustomUserCreationForm
 )
-
+from .forms import CustomUserCreationForm, CustomUserChangeForm
 
 # --- Utility Functions and Decorators ---
 @login_required
@@ -147,12 +147,12 @@ def role_redirect(request):
 #--------------------------------------------------------------------------------------------------------------------------
 # --- Dashboard Views ---
 @login_required
-@user_passes_test(lambda u: u.groups.filter(name='ADMIN').exists(), login_url='school:no_permission')
+@role_required(['ADMIN'])
 def admin_dashboard(request):
     context = {
         'teachers_count': Teacher.objects.count(),
         'students_count': Student.objects.count(),
-        'classes_count': Classroom.objects.count(),
+        'classes_count': ClassRoom.objects.count(),
         'subjects_count': Subject.objects.count(),
         'users_count': User.objects.count(),
         'recent_users': User.objects.order_by('-date_joined')[:5],
@@ -160,12 +160,12 @@ def admin_dashboard(request):
     return render(request, 'school/admin_dashboard.html', context)
 
 @login_required
-@user_passes_test(lambda u: u.groups.filter(name='ADMIN').exists(), login_url='school:no_permission')
+@role_required(['ADMIN'])
 def admin_dashboard_data(request):
     data = {
         'teachers_count': Teacher.objects.count(),
         'students_count': Student.objects.count(),
-        'classes_count': Classroom.objects.count(),
+        'classes_count': ClassRoom.objects.count(),
         'subjects_count': Subject.objects.count(),
         'users_count': User.objects.count(),
         'recent_users': list(User.objects.order_by('-date_joined').values(
@@ -733,7 +733,29 @@ def user_list(request):
     """Lists all users (Admin only)."""
     users = User.objects.all()
     return render(request, 'school/user_list.html', {'users': users})
+@role_required(['ADMIN'])
+def user_edit(request, pk):
+    user = get_object_or_404(User, pk=pk)
+    if request.method == 'POST':
+        form = CustomUserChangeForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"User '{user.username}' updated successfully.")
+            return redirect('school:user_list')
+        else:
+            messages.error(request, "Error updating user. Please correct the form errors.")
+    else:
+        form = CustomUserChangeForm(instance=user)
+    return render(request, 'school/user_form.html', {'form': form, 'title': f"Edit User: {user.username}"})
 
+@role_required(['ADMIN'])
+def user_delete(request, pk):
+    user = get_object_or_404(User, pk=pk)
+    if request.method == 'POST':
+        user.delete()
+        messages.success(request, f"User '{user.username}' deleted successfully.")
+        return redirect('school:user_list')
+    return render(request, 'school/user_confirm_delete.html', {'user': user})
 #--------------------------------------------------------------------------------------------------------------------------
 @role_required(['ADMIN'])
 def user_create_by_admin(request):

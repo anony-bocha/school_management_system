@@ -111,24 +111,29 @@
             <h1>School Management System</h1>
             <button class="menu-toggle ms-auto" aria-label="Toggle Menu" aria-expanded="false">&#9776;</button>
         </div>
-        <nav>
-            <a href="{% url 'school:home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a>
-            <a href="{% url 'school:classroom_list' %}" class="{% if 'classroom' in request.path %}active{% endif %}">Classrooms</a>
-            <a href="{% url 'school:teacher_list' %}" class="{% if 'teacher' in request.path %}active{% endif %}">Teachers</a>
-            <a href="{% url 'school:student_list' %}" class="{% if 'student' in request.path %}active{% endif %}">Students</a>
-            <a href="{% url 'school:subject_list' %}" class="{% if 'subject' in request.path %}active{% endif %}">Subjects</a>
-            <a href="{% url 'school:attendance_list' %}" class="{% if 'attendance' in request.path %}active{% endif %}">Attendance</a>
-            <a href="{% url 'school:grade_list' %}" class="{% if 'grade' in request.path %}active{% endif %}">Grades</a>
+       <nav>
+    <a href="{% url 'school:home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a>
+    <a href="{% url 'school:classroom_list' %}" class="{% if 'classroom' in request.path %}active{% endif %}">Classrooms</a>
+    <a href="{% url 'school:teacher_list' %}" class="{% if 'teacher' in request.path %}active{% endif %}">Teachers</a>
+    <a href="{% url 'school:student_list' %}" class="{% if 'student' in request.path %}active{% endif %}">Students</a>
+    <a href="{% url 'school:subject_list' %}" class="{% if 'subject' in request.path %}active{% endif %}">Subjects</a>
+    <a href="{% url 'school:attendance_list' %}" class="{% if 'attendance' in request.path %}active{% endif %}">Attendance</a>
+    <a href="{% url 'school:grade_list' %}" class="{% if 'grade' in request.path %}active{% endif %}">Grades</a>
 
-            {% if user.is_authenticated %}
-                <form id="logout-form" action="{% url 'school:logout' %}" method="post" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit" title="Logout">{{ user.username }} &#x1F511;</button>
-                </form>
-            {% else %}
-                <a href="{% url 'school:login' %}" class="{% if 'login' in request.path %}active{% endif %}">Login</a>
-            {% endif %}
-        </nav>
+    {% if user.is_authenticated %}
+        {% if user.is_superuser or user.role|default:''|upper == 'ADMIN' %}
+            <a href="{% url 'school:user_list' %}" class="{% if 'users' in request.path %}active{% endif %}">User Management</a>
+        {% endif %}
+
+        <form id="logout-form" action="{% url 'school:logout' %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" title="Logout">{{ user.username }} &#x1F511;</button>
+        </form>
+    {% else %}
+        <a href="{% url 'school:login' %}" class="{% if 'login' in request.path %}active{% endif %}">Login</a>
+    {% endif %}
+</nav>
+
     </header>
 
     <div class="container py-4">

@@ -1,15 +1,37 @@
 from django import forms
-from .models import Grade, Attendance, Student, Teacher, Subject, ClassRoom
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
-from .models import User
+from django.contrib.auth.forms import UserCreationForm, ReadOnlyPasswordHashField
 
-class CustomUserCreationForm(UserCreationForm):
-    class Meta:
-        model = User
-        fields = ('username', 'email', 'role')
+from .models import Grade, Attendance, Student, Teacher, Subject, ClassRoom, User
 
 User = get_user_model()
+
+class CustomUserCreationForm(UserCreationForm):
+    """
+    Custom form for creating users with additional fields.
+    """
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'role', 'is_active']
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        user.role = self.cleaned_data['role']
+        user.is_active = self.cleaned_data['is_active']
+        if commit:
+            user.save()
+        return user
+
+class CustomUserChangeForm(forms.ModelForm):
+    """
+    Custom form for updating users in admin/user edit views.
+    """
+    password = ReadOnlyPasswordHashField(help_text="Passwords are not stored raw. You can change it using <a href=\"../password/\">this form</a>.")
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'role', 'is_active', 'password']
 
 class GradeForm(forms.ModelForm):
     class Meta:
@@ -34,7 +56,7 @@ class TeacherForm(forms.ModelForm):
         model = Teacher
         fields = ['name', 'gender', 'subjects', 'contact']
         widgets = {
-            'subjects': forms.CheckboxSelectMultiple(),  # Multi-select checkbox widget
+            'subjects': forms.CheckboxSelectMultiple(),
         }
 
 class SubjectForm(forms.ModelForm):
@@ -49,8 +71,3 @@ class ClassRoomForm(forms.ModelForm):
         widgets = {
             'subjects': forms.CheckboxSelectMultiple(),
         }
-
-class CustomUserCreationForm(UserCreationForm):
-    class Meta:
-        model = User
-        fields = ['username', 'email', 'password1', 'password2']

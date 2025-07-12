@@ -19,7 +19,9 @@ urlpatterns = [
 
     # User Management (Admin only)
     path('users/', views.user_list, name='user_list'),
-    path('users/create/', views.user_create_by_admin, name='user_create_by_admin'), # Keep one instance
+    path('users/create/', views.user_create_by_admin, name='user_create_by_admin'),
+    path('users/<int:pk>/edit/', views.user_edit, name='user_edit'),
+    path('users/<int:pk>/delete/', views.user_delete, name='user_delete'), # Keep one instance
 
     # --- Dashboards ---
    

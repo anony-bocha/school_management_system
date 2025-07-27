@@ -1,8 +1,10 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
-from datetime import time
-from .models import (
+from datetime import time, date
+from decimal import Decimal
+
+from school.models import (
     User, ClassRoom, Subject, Teacher, Student, Attendance,
     Grade, Timetable, Fee, Notice
 )
@@ -59,12 +61,12 @@ class AttendanceModelTest(TestCase):
         self.student = Student.objects.create(user=user, name='John Doe', age=13, gender='Male', classroom=classroom)
 
     def test_create_attendance(self):
-        attendance = Attendance.objects.create(student=self.student, date='2025-07-27', status='Present')
-        self.assertEqual(str(attendance), f"John Doe - 2025-07-27 - Present")
+        attendance = Attendance.objects.create(student=self.student, date=date.today(), status='Present')
+        self.assertEqual(str(attendance), f"{self.student.name} - {attendance.date} - Present")
 
     def test_unique_constraint_on_attendance(self):
-        Attendance.objects.create(student=self.student, date='2025-07-27', status='Present')
-        duplicate = Attendance(student=self.student, date='2025-07-27', status='Absent')
+        Attendance.objects.create(student=self.student, date=date.today(), status='Present')
+        duplicate = Attendance(student=self.student, date=date.today(), status='Absent')
         with self.assertRaises(ValidationError):
             duplicate.full_clean()
 
@@ -127,8 +129,8 @@ class FeeModelTest(TestCase):
         self.student = Student.objects.create(user=user, name='Bob', age=15, gender='Male', classroom=classroom)
 
     def test_create_fee(self):
-        fee = Fee.objects.create(student=self.student, amount=1000.00, status='Paid')
-        self.assertEqual(str(fee), f"Bob - 1000.00 - Paid")
+        fee = Fee.objects.create(student=self.student, amount=Decimal('1000.00'), status='Paid')
+        self.assertEqual(str(fee), "Bob - 1000.00 - Paid")
 
 class NoticeModelTest(TestCase):
     def setUp(self):

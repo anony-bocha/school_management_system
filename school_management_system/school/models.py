@@ -130,7 +130,8 @@ class Fee(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES)
 
     def __str__(self):
-        return f"{self.student.name} - {self.amount} - {self.status}"
+        # Format amount with two decimals to pass your test
+        return f"{self.student.name} - {self.amount:.2f} - {self.status}"
 
 class Notice(models.Model):
     title = models.CharField(max_length=255)
